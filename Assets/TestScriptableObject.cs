@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[CreateAssetMenu()]
-public class NewBehaviourScript : ScriptableObject
+//[CreateAssetMenu()]
+public class TestScriptableObject : ScriptableObject
 {
 	[Serializable]
 	public class marisco

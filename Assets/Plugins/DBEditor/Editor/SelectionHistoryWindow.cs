@@ -3,32 +3,25 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Gemserk
+namespace DBEditor
 {
 	[InitializeOnLoad]
 	public static class SelectionHistoryInitialized
 	{
 		static SelectionHistoryInitialized()
 		{
-			SelectionHistoryWindow.RegisterSelectionListener ();
+			SelectionHistoryWindow.RegisterSelectionListener();
 		}
 	}
 
-	public class SelectionHistoryWindow : EditorWindow {
-
-		public static readonly string HistorySizePrefKey = "Gemserk.SelectionHistory.HistorySize";
-		public static readonly string HistoryAutomaticRemoveDeletedPrefKey = "Gemserk.SelectionHistory.AutomaticRemoveDeleted";
-		public static readonly string HistoryAllowDuplicatedEntriesPrefKey = "Gemserk.SelectionHistory.AllowDuplicatedEntries";
-
+	public class SelectionHistoryWindow : EditorWindow
+	{
 		static readonly SelectionHistory selectionHistory = new SelectionHistory();
-
-		static readonly bool debugEnabled = false;
-
-		public static bool shouldReloadPreferences = true;
 
 		// Add menu named "My Window" to the Window menu
 		[MenuItem ("Window/Gemserk/Selection History %#h")]
-		static void Init () {
+		static void Init()
+		{
 			// Get existing open window or if none, make a new one:
 //			var window = ScriptableObject.CreateInstance<SelectionHistoryWindow>();
 			var window = EditorWindow.GetWindow<SelectionHistoryWindow> ();
@@ -39,12 +32,8 @@ namespace Gemserk
 
 		static void SelectionRecorder ()
 		{
-			if (Selection.activeObject != null) {
-				if (debugEnabled) {
-					Debug.Log ("Recording new selection: " + Selection.activeObject.name);
-				}
-
-				selectionHistory.History = EditorTemporaryMemory.Instance.history;
+			if (Selection.activeObject != null)
+			{
 				selectionHistory.UpdateSelection (Selection.activeObject);
 			} 
 		}
@@ -54,39 +43,27 @@ namespace Gemserk
 			Selection.selectionChanged += SelectionRecorder;
 		}
 
-		public GUISkin windowSkin;
-
-		MethodInfo openPreferencesWindow;
-
 		void OnEnable()
 		{
-			automaticRemoveDeleted = EditorPrefs.GetBool (HistoryAutomaticRemoveDeletedPrefKey, true);
-
-			selectionHistory.History = EditorTemporaryMemory.Instance.history;
-			selectionHistory.HistorySize = EditorPrefs.GetInt (HistorySizePrefKey, 10);
-
-			Selection.selectionChanged += delegate {
-
-				if (selectionHistory.IsSelected(selectionHistory.GetHistoryCount() - 1)) {
-					scrollPosition.y = float.MaxValue;
-				}
-
-				Repaint();
-			};
-
-			try {
-				var asm = Assembly.GetAssembly (typeof(EditorWindow));
-				var t = asm.GetType ("UnityEditor.PreferencesWindow");
-				openPreferencesWindow = t.GetMethod ("ShowPreferencesWindow", BindingFlags.NonPublic | BindingFlags.Static);
-			} catch {
-				// couldnt get preferences window...
-				openPreferencesWindow = null;
+			automaticRemoveDeleted = true;
+			
+			Selection.selectionChanged += OnSelectionChanged;
+		}
+		
+		void OnSelectionChanged()
+		{
+			if (selectionHistory.IsSelected(selectionHistory.GetHistoryCount() - 1))
+			{
+				scrollPosition.y = float.MaxValue;
 			}
+			
+			Repaint();
 		}
 
 		void UpdateSelection(int currentIndex)
 		{
 			/*Selection.activeObject = */selectionHistory.UpdateSelection(currentIndex);
+			GUI.FocusControl(null);
 		}
 
 		Vector2 scrollPosition;
@@ -94,21 +71,9 @@ namespace Gemserk
 		bool automaticRemoveDeleted;
 		bool allowDuplicatedEntries;
 
-		void OnGUI () {
+		void OnGUI()
+		{
 			DrawSearchBar();
-
-			if (shouldReloadPreferences) {
-				selectionHistory.HistorySize = EditorPrefs.GetInt (SelectionHistoryWindow.HistorySizePrefKey, 10);
-				automaticRemoveDeleted = EditorPrefs.GetBool (SelectionHistoryWindow.HistoryAutomaticRemoveDeletedPrefKey, true);
-				allowDuplicatedEntries = EditorPrefs.GetBool (SelectionHistoryWindow.HistoryAllowDuplicatedEntriesPrefKey, false);
-				shouldReloadPreferences = false;
-			}
-
-			if (automaticRemoveDeleted)
-				selectionHistory.ClearDeleted ();
-
-			if (!allowDuplicatedEntries)
-				selectionHistory.RemoveDuplicated ();
 			
 			EditorGUILayout.BeginHorizontal();
 			
@@ -153,22 +118,6 @@ namespace Gemserk
 				selectionHistory.Clear();
 				Repaint();
 			}
-
-			if (!automaticRemoveDeleted) {
-				if (GUILayout.Button ("Remove Deleted")) {
-					selectionHistory.ClearDeleted ();
-					Repaint ();
-				}
-			} 
-
-			if (allowDuplicatedEntries) {
-				if (GUILayout.Button ("Remove Duplciated")) {
-					selectionHistory.RemoveDuplicated ();
-					Repaint ();
-				}
-			} 
-
-			DrawSettingsButton ();
 		}
 		
 		string searchString = "";
@@ -179,45 +128,27 @@ namespace Gemserk
 			if (editorSkin == null)
 				editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
 			
-			GUILayout.BeginHorizontal(editorSkin.FindStyle("Toolbar"));//EditorStyles.toolbar);
+			GUILayout.BeginHorizontal(editorSkin.FindStyle("Toolbar"));
 			someOption = GUILayout.Toggle(someOption, "Toggle Me", EditorStyles.toolbarButton);
 			GUILayout.Button("Pepe", EditorStyles.toolbarDropDown);
 			GUILayout.FlexibleSpace();
 			
-			searchString = GUILayout.TextField(searchString, editorSkin.FindStyle("ToolbarSeachTextField"));
-			if (GUILayout.Button("", editorSkin.FindStyle("ToolbarSeachCancelButton"), GUILayout.Width(80)))
+			searchString = GUILayout.TextField(searchString, editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(100));
+			if (string.IsNullOrEmpty(searchString))
 			{
-    			// Remove focus if cleared
-				searchString = "";
-				GUI.FocusControl(null);
+				GUILayout.Button("", editorSkin.FindStyle("ToolbarSeachCancelButtonEmpty"));
 			}
-			
+			else
+			{
+				if (GUILayout.Button("", editorSkin.FindStyle("ToolbarSeachCancelButton")))
+				{
+	    			// Remove focus if cleared
+					searchString = "";
+					GUI.FocusControl(null);
+				}
+			}
 			//searchString = EditorGUILayout.TextField(searchString, EditorStyles.toolbarTextField);
 			GUILayout.EndHorizontal();
-		}
-
-		void DrawSettingsButton()
-		{
-			if (openPreferencesWindow == null)
-				return;
-			
-			if (GUILayout.Button ("Preferences")) {
-				openPreferencesWindow.Invoke(null, null);
-			}
-		}
-			
-		[MenuItem("Window/Gemserk/Previous selection %#,")]
-		public static void PreviousSelection()
-		{
-			selectionHistory.Previous ();
-			Selection.activeObject = selectionHistory.GetSelection ();
-		}
-
-		[MenuItem("Window/Gemserk/Next selection %#.")]
-		public static void Nextelection()
-		{
-			selectionHistory.Next();
-			Selection.activeObject = selectionHistory.GetSelection ();
 		}
 
 		void DrawHistory()

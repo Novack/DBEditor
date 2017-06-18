@@ -70,28 +70,6 @@ public class SelectionHistory
 		}
 	}
 
-	public void Previous()
-	{
-		if (history.Count == 0)
-			return;
-
-		currentSelectionIndex--;
-		if (currentSelectionIndex < 0)
-			currentSelectionIndex = 0;
-		currentSelection = history[currentSelectionIndex];
-	}
-
-	public void Next()
-	{
-		if (history.Count == 0)
-			return;
-
-		currentSelectionIndex++;
-		if (currentSelectionIndex >= history.Count)
-			currentSelectionIndex = history.Count - 1;
-		currentSelection = history[currentSelectionIndex];
-	}
-
 	public Object UpdateSelection(int currentIndex)
 	{
 		currentSelectionIndex = currentIndex;
@@ -113,26 +91,6 @@ public class SelectionHistory
 
 		if (currentSelection == null)
 			currentSelectionIndex = -1;
-	}
-
-	public void RemoveDuplicated()
-	{
-		var tempList = new List<Object> (history);
-
-		foreach (var item in tempList) {
-			var itemFirstIndex = history.IndexOf (item);
-			var itemLastIndex = history.LastIndexOf (item);
-
-			while (itemFirstIndex != itemLastIndex) {
-				history.RemoveAt (itemFirstIndex);
-
-				itemFirstIndex = history.IndexOf (item);
-				itemLastIndex = history.LastIndexOf (item);
-			}
-		}
-
-		if (currentSelectionIndex >= history.Count)
-			currentSelectionIndex = history.Count - 1;
 	}
 
 }
