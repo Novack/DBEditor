@@ -13,6 +13,8 @@ public class TestScriptableObject : ScriptableObject
 		public int size;
 	}
 	
+	public TestScriptableObject testScriptableObject;
+	
 	[HideInInspector]
 	public int none;
 	public float lala;

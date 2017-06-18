@@ -1,79 +1,47 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace DBEditor
 {
-	[InitializeOnLoad]
-	public static class SelectionHistoryInitialized
-	{
-		static SelectionHistoryInitialized()
-		{
-			SelectionHistoryWindow.RegisterSelectionListener();
-		}
-	}
-
 	public class SelectionHistoryWindow : EditorWindow
 	{
-		static readonly SelectionHistory selectionHistory = new SelectionHistory();
+		public DBEditorConfig config;
+		
+		private SelectionHistory selectionHistory;
+		private Vector2 scrollPosition;
+		private string searchString = "";
+		private bool someOption;
+		private GUISkin editorSkin;
 
-		// Add menu named "My Window" to the Window menu
-		[MenuItem ("Window/Gemserk/Selection History %#h")]
+		[MenuItem ("Window/DBEditor")]
 		static void Init()
 		{
 			// Get existing open window or if none, make a new one:
 //			var window = ScriptableObject.CreateInstance<SelectionHistoryWindow>();
 			var window = EditorWindow.GetWindow<SelectionHistoryWindow> ();
 
-			window.titleContent.text = "History";
+			window.titleContent.text = "DBEditor";
 			window.Show();
 		}
-
-		static void SelectionRecorder ()
-		{
-			if (Selection.activeObject != null)
-			{
-				selectionHistory.UpdateSelection (Selection.activeObject);
-			} 
-		}
-
-		public static void RegisterSelectionListener()
-		{
-			Selection.selectionChanged += SelectionRecorder;
-		}
-
-		void OnEnable()
-		{
-			automaticRemoveDeleted = true;
-			
-			Selection.selectionChanged += OnSelectionChanged;
-		}
 		
-		void OnSelectionChanged()
+		public void Awake()
 		{
-			if (selectionHistory.IsSelected(selectionHistory.GetHistoryCount() - 1))
-			{
-				scrollPosition.y = float.MaxValue;
-			}
+			selectionHistory = new SelectionHistory();
+			selectionHistory.LoadDB(config);
 			
-			Repaint();
+			editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
 		}
 
 		void UpdateSelection(int currentIndex)
 		{
-			/*Selection.activeObject = */selectionHistory.UpdateSelection(currentIndex);
+			selectionHistory.UpdateSelection(currentIndex);
 			GUI.FocusControl(null);
 		}
 
-		Vector2 scrollPosition;
-
-		bool automaticRemoveDeleted;
-		bool allowDuplicatedEntries;
-
 		void OnGUI()
 		{
-			DrawSearchBar();
+			DrawToolBar();
 			
 			EditorGUILayout.BeginHorizontal();
 			
@@ -100,9 +68,9 @@ namespace DBEditor
 			
 			//EditorGUILayout.EndScrollView();
 			
-			EditorGUILayout.BeginVertical(GUILayout.Width(500f));
+			EditorGUILayout.BeginVertical(/*GUILayout.Width(500f)*/);
 
-			var selected = selectionHistory.GetSelection();// as GameObject;
+			var selected = selectionHistory.CurrentSelection;// as GameObject;
 			if (selected != null)
 			{
 				Editor editor = Editor.CreateEditor(selected);
@@ -113,62 +81,64 @@ namespace DBEditor
 			EditorGUILayout.EndVertical();
 			
 			EditorGUILayout.EndHorizontal();
+			
+			EditorGUILayout.Space();
 
-			if (GUILayout.Button("Clear")) {
-				selectionHistory.Clear();
+			if (GUILayout.Button("Clear"))
+			{
+				selectionHistory.History.Clear();
 				Repaint();
 			}
 		}
 		
-		string searchString = "";
-		bool someOption;
-		GUISkin editorSkin;
-		void DrawSearchBar()
+		void DrawToolBar()
 		{
-			if (editorSkin == null)
-				editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
-			
 			GUILayout.BeginHorizontal(editorSkin.FindStyle("Toolbar"));
+			
 			someOption = GUILayout.Toggle(someOption, "Toggle Me", EditorStyles.toolbarButton);
-			GUILayout.Button("Pepe", EditorStyles.toolbarDropDown);
+			GUILayout.Button("DropDownBtn", EditorStyles.toolbarDropDown);
+			
+			if (selectionHistory.CurrentSelection != null)
+			{
+				if (GUILayout.Button("Find in Project", editorSkin.FindStyle("toolbarbutton")))
+				{
+					EditorGUIUtility.PingObject(selectionHistory.CurrentSelection);
+				}
+			}
+			
 			GUILayout.FlexibleSpace();
 			
 			searchString = GUILayout.TextField(searchString, editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(100));
-			if (string.IsNullOrEmpty(searchString))
+			var editorStyle = string.IsNullOrEmpty(searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
+			if (GUILayout.Button("", editorSkin.FindStyle(editorStyle)))
 			{
-				GUILayout.Button("", editorSkin.FindStyle("ToolbarSeachCancelButtonEmpty"));
+				searchString = "";
+				GUI.FocusControl(null);
 			}
-			else
-			{
-				if (GUILayout.Button("", editorSkin.FindStyle("ToolbarSeachCancelButton")))
-				{
-	    			// Remove focus if cleared
-					searchString = "";
-					GUI.FocusControl(null);
-				}
-			}
-			//searchString = EditorGUILayout.TextField(searchString, EditorStyles.toolbarTextField);
+			
 			GUILayout.EndHorizontal();
 		}
 
 		void DrawHistory()
 		{
 			var nonSelectedColor = GUI.contentColor;
-
 			var history = selectionHistory.History;
+			var buttonStyle = editorSkin.GetStyle("Label");
 
-			var buttonStyle = EditorStyles.label; //windowSkin.GetStyle("SelectionButton");
-
-			for (int i = 0; i < history.Count; i++) {
+			for (int i = 0; i < history.Count; i++)
+			{
 				var historyElement = history [i];
 
-				if (selectionHistory.IsSelected(i)) {
+				if (selectionHistory.IsSelected(i))
+				{
 					GUI.contentColor = new Color(0.2f, 170.0f / 255.0f, 1.0f, 1.0f);
-				} else {
+				}
+				else
+				{
 					GUI.contentColor = nonSelectedColor;
 				}
 
-				var rect = EditorGUILayout.BeginHorizontal ();
+				var rect = EditorGUILayout.BeginHorizontal();
 
 				//if (historyElement == null) {
 				//	GUILayout.Label ("Deleted", buttonStyle); 
@@ -202,61 +172,34 @@ namespace DBEditor
 
 		void ButtonLogic(int currentIndex, Rect rect, Object currentObject)
 		{
-			var currentEvent = Event.current;
-
-			if (currentEvent == null)
+			if (Event.current == null)
 				return;
 
-			if (!rect.Contains (currentEvent.mousePosition))
+			if (!rect.Contains(Event.current.mousePosition))
 				return;
 			
-//			Debug.Log (string.Format("event:{0}", currentEvent.ToString()));
+			if (currentObject == null)
+				return;
+			
+//			Debug.Log(string.Format("event:{0}", currentEvent.ToString()));
 
-			var eventType = currentEvent.type;
+			if (Event.current.type == EventType.MouseDrag)
+			{
+				DragAndDrop.PrepareStartDrag();
+				DragAndDrop.StartDrag(currentObject.name);
+				DragAndDrop.objectReferences = new Object[] { currentObject };
 
-			if (eventType == EventType.MouseDrag) {
-
-				if (currentObject != null) {
-					DragAndDrop.PrepareStartDrag ();
-
-					DragAndDrop.StartDrag (currentObject.name);
-
-					DragAndDrop.objectReferences = new Object[] { currentObject };
-
-//					if (ProjectWindowUtil.IsFolder(currentObject.GetInstanceID())) {
-
-					// fixed to use IsPersistent to work with all assets with paths.
-					if (EditorUtility.IsPersistent(currentObject)) {
-
-						// added DragAndDrop.path in case we are dragging a folder.
-
-						DragAndDrop.paths = new string[] {
-							AssetDatabase.GetAssetPath(currentObject)
-						};
-
-						// previous test with setting generic data by looking at
-						// decompiled Unity code.
-
-						// DragAndDrop.SetGenericData ("IsFolder", "isFolder");
-					}
-				}
-
-				Event.current.Use ();
-
-			} else if (eventType == EventType.MouseUp) {
-
-				if (currentObject != null) {
-					if (Event.current.button == 0) {
-						UpdateSelection (currentIndex);
-					} else {
-						EditorGUIUtility.PingObject (currentObject);
-					}
-				}
-
-				Event.current.Use ();
+				Event.current.Use();
 			}
+			else if (Event.current.type == EventType.MouseUp)
+			{
+				if (Event.current.button == 0)
+				{
+					UpdateSelection(currentIndex);
+				}
 
+				Event.current.Use();
+			}
 		}
-
 	}
 }

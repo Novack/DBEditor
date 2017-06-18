@@ -1,96 +1,31 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
-public class SelectionHistory
+namespace DBEditor
 {
-	List<Object> history = new List<Object>(100);
-
-	int currentSelectionIndex;
-
-	Object currentSelection;
-
-	int historySize = 10;
-
-	public List<Object> History {
-		get {
-			return history;
-		}
-		set {
-			history = value;
-		}
-	}
-
-	public int HistorySize {
-		get {
-			return historySize;
-		}
-		set {
-			historySize = value;
-		}
-	}
-
-	public bool IsSelected(int index)
+	public class SelectionHistory
 	{
-		return index == currentSelectionIndex;
-	}
-
-	public void Clear()
-	{
-		history.Clear ();
-	}
-
-	public int GetHistoryCount()
-	{
-		return history.Count;	
-	}
-
-	public Object GetSelection()
-	{
-		return currentSelection;
-	}
-
-	public void UpdateSelection(Object selection)
-	{
-		if (selection == null)
-			return;
+		public List<Object> History;
+		public Object CurrentSelection;
 		
-		var lastSelectedObject = history.Count > 0 ? history.Last() : null;
-
-		if (lastSelectedObject != selection && currentSelection != selection) {
-			history.Add(selection);
-			currentSelectionIndex = history.Count - 1;
+		public void LoadDB(DBEditorConfig config)
+		{
+			History = new List<Object>(100);
+			for (int i = 0; i < config.files.Count; i++)
+			{
+				History.Add(config.files[i]);
+			}
+		}
+		
+		public bool IsSelected(int index)
+		{
+			return History[index] == CurrentSelection;
 		}
 
-		currentSelection = selection;
-
-		if (history.Count > historySize) {
-			history.RemoveRange(0, history.Count - historySize);
-			//			history.RemoveAt(0);
+		public Object UpdateSelection(int currentIndex)
+		{
+			CurrentSelection = History[currentIndex];
+			return CurrentSelection;
 		}
 	}
-
-	public Object UpdateSelection(int currentIndex)
-	{
-		currentSelectionIndex = currentIndex;
-		currentSelection = history[currentSelectionIndex];
-
-		return currentSelection;
-	}
-
-	public void ClearDeleted()
-	{
-		var deletedCount = history.Count(e => e == null);
-
-		history.RemoveAll (e => e == null);
-
-		currentSelectionIndex -= deletedCount;
-
-		if (currentSelectionIndex < 0)
-			currentSelectionIndex = 0;
-
-		if (currentSelection == null)
-			currentSelectionIndex = -1;
-	}
-
 }

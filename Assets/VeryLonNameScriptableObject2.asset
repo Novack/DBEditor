@@ -9,15 +9,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc0e419aa55d854478225f6c2ca4d080, type: 3}
-  m_Name: Pepe2
+  m_Name: VeryLonNameScriptableObject2
   m_EditorClassIdentifier: 
+  testScriptableObject: {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca,
+    type: 2}
   none: 0
-  lala: 2
+  lala: 3
   lele: 000000000000000000000000
   lilo: 00000000000000000000000000000000000000007d000000
-  strele: fdgdhfg
-  col: {r: 0.36634946, g: 0.3699588, b: 0.8897059, a: 1}
+  strele: chdvcnvnbfvbn
+  col: {r: 0.36634946, g: 0.8897059, b: 0.69480085, a: 1}
   vec: {x: 0, y: 0, z: 0}
   caracok:
-    name: 
+    name: jhgjhg
     size: 0
