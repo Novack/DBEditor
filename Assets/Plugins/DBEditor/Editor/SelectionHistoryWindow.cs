@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace DBEditor
 {
+	using UnityEditor.IMGUI.Controls;
 	public class SelectionHistoryWindow : EditorWindow
 	{
 		public DBEditorConfig config;
@@ -13,6 +14,8 @@ namespace DBEditor
 		private string searchString = "";
 		private bool someOption;
 		private GUISkin editorSkin;
+		private TreeViewState m_TreeViewState;
+		private SimpleTreeView m_SimpleTreeView;
 
 		[MenuItem ("Window/DBEditor")]
 		static void Init()
@@ -20,13 +23,17 @@ namespace DBEditor
 			// Get existing open window or if none, make a new one:
 //			var window = ScriptableObject.CreateInstance<SelectionHistoryWindow>();
 			var window = EditorWindow.GetWindow<SelectionHistoryWindow> ();
-
 			window.titleContent.text = "DBEditor";
 			window.Show();
 		}
 		
 		public void Awake()
 		{
+			if (m_TreeViewState == null)
+				m_TreeViewState = new TreeViewState ();
+			
+			m_SimpleTreeView = new SimpleTreeView(m_TreeViewState);
+			
 			selectionHistory = new SelectionHistory();
 			selectionHistory.LoadDB(config);
 			
@@ -38,12 +45,20 @@ namespace DBEditor
 			selectionHistory.UpdateSelection(currentIndex);
 			GUI.FocusControl(null);
 		}
-
+		
 		void OnGUI()
 		{
 			DrawToolBar();
 			
 			EditorGUILayout.BeginHorizontal();
+			
+			EditorGUILayout.BeginVertical(GUILayout.Width(220f));
+			
+			GUILayout.FlexibleSpace();
+			GUI.Box(new Rect(10, 20, 200, 350), "");
+			m_SimpleTreeView.OnGUI(new Rect(10, 20, 200, 350));
+
+			EditorGUILayout.EndVertical();
 			
 			EditorGUILayout.BeginVertical(GUILayout.Width(100f));
 			GUILayout.Button("Pepa");
@@ -153,14 +168,7 @@ namespace DBEditor
 
 					// chnanged to label to be able to handle events for drag
 					GUILayout.Label (content, buttonStyle, GUILayout.Height(20)); 
-
 					GUI.contentColor = nonSelectedColor;
-
-				//	if (GUILayout.Button ("Ping", windowSkin.button)) {
-				//		EditorGUIUtility.PingObject (historyElement);
-				//	}
-
-				//}
 					
 				EditorGUILayout.EndHorizontal ();
 
