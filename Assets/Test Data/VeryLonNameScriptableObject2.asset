@@ -14,10 +14,11 @@ MonoBehaviour:
   testScriptableObject: {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca,
     type: 2}
   none: 0
-  lala: 3
+  lala: 2
   lele: 000000000000000000000000
   lilo: 00000000000000000000000000000000000000007d000000
-  strele: chdvcnvnbfvbn
+  strele: iuyoiu2
+  MyTextArea: 
   col: {r: 0.36634946, g: 0.8897059, b: 0.69480085, a: 1}
   vec: {x: 0, y: 0, z: 0}
   caracok:

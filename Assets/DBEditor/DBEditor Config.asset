@@ -11,6 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e0e553266a8274da2c2b77fd873cad, type: 3}
   m_Name: DBEditor Config
   m_EditorClassIdentifier: 
+  MaxCategoryId: 100
   files:
   - {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca, type: 2}
   - {fileID: 11400000, guid: 69d6437e80d5acb479d6a1154bd11cd4, type: 2}
+  - {fileID: 11400000, guid: c3650aedc28322b45a37a3ab6479ad08, type: 2}
+  - {fileID: 11400000, guid: bd60177cf5f101844b2e02a921533c41, type: 2}
+  - {fileID: 11400000, guid: ce7651dbc61edf047971ea94c83bb465, type: 2}

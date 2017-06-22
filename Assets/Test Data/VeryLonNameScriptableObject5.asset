@@ -18,6 +18,7 @@ MonoBehaviour:
   lele: 000000000000000000000000
   lilo: 00000000000000000000000000000000000000007d000000
   strele: iuyoiu2
+  MyTextArea: 
   col: {r: 0.36634946, g: 0.8897059, b: 0.69480085, a: 1}
   vec: {x: 0, y: 0, z: 0}
   caracok:

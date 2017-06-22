@@ -21,6 +21,8 @@ public class TestScriptableObject : ScriptableObject
 	public List<int> lele;
 	public int[] lilo;
 	public string strele;
+	[TextArea]
+	public string MyTextArea;
 	[Header("gffgsfdcg")]
 	public Color col;
 	[Space(10)]

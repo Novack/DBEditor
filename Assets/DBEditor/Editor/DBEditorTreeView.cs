@@ -7,6 +7,7 @@ using UnityEngine;
 class DBEditorTreeView : TreeView
 {
 	private DBEditorConfig config;
+	private int _currentCatId;
 
 	public DBEditorTreeView(TreeViewState treeViewState, DBEditorConfig configParam) : base(treeViewState)
 	{
@@ -17,17 +18,20 @@ class DBEditorTreeView : TreeView
 	
 	protected override TreeViewItem BuildRoot()
 	{
-		var root = new TreeViewItem      { id = 0, depth = -1, displayName = "Root" };
+		var root = new TreeViewItem { id = 0, depth = -1, displayName = "Root" };
 		
-		var pepe = new TreeViewItem(10);
+		_currentCatId = 1;
+		
+		var pepe = new TreeViewItem(_currentCatId);
 		pepe.displayName = "pepito";
-		pepe.icon = EditorGUIUtility.FindTexture("Folder Icon"); //("FolderEmpty Icon");
+		pepe.icon = EditorGUIUtility.FindTexture("Folder Icon");
+		_currentCatId++;
 
 		root.AddChild(pepe);	
 		
 		for (int i = 0; i < config.files.Count; i++)
 		{
-			var item = new TreeViewItem(config.files[i].GetInstanceID());// 100+i);
+			var item = new TreeViewItem(config.files[i].GetInstanceID());
 			item.displayName = config.files[i].name;
 			item.icon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
 			//item.icon = AssetPreview.GetMiniThumbnail(config.files[i]);
@@ -44,7 +48,7 @@ class DBEditorTreeView : TreeView
 	{
 		if (args.draggedItem != null)
 		{
-			if (args.draggedItem.id < 100)
+			if (args.draggedItem.id < config.MaxCategoryId)
 				return false;
 		}
 		
@@ -52,7 +56,7 @@ class DBEditorTreeView : TreeView
 		{
 			for (int i = 0; i < args.draggedItemIDs.Count; i++)
 			{
-				if (args.draggedItemIDs[i] < 100)
+				if (args.draggedItemIDs[i] < config.MaxCategoryId)
 					return false;
 			}
 		}
@@ -74,7 +78,7 @@ class DBEditorTreeView : TreeView
 	
 	protected override bool CanRename(TreeViewItem item)
 	{
-		if (item.id < 100)
+		if (item.id < config.MaxCategoryId)
 			return false;
 		
 		return true;
@@ -93,6 +97,19 @@ class DBEditorTreeView : TreeView
 		item.displayName = args.newName;
 	}
 	
+	protected override bool CanChangeExpandedState(TreeViewItem item)
+	{
+		if (item.id > config.MaxCategoryId)
+			return false;
+		
+		if (IsExpanded(item.id))
+			item.icon = EditorGUIUtility.FindTexture("FolderEmpty Icon");
+		else
+			item.icon = EditorGUIUtility.FindTexture("Folder Icon");
+		
+		return true;
+	}
+	
 	public void StartRename()
 	{
 		if (state.selectedIDs.Count == 0)
@@ -100,6 +117,49 @@ class DBEditorTreeView : TreeView
 		
 		var item = FindItem(state.selectedIDs[0], rootItem);
 		BeginRename(item);
+	}
+	
+	public void Delete()
+	{
+		if (state.selectedIDs.Count == 0)
+			return;
+		
+		// Only deleting first of the selection list.
+		int id = state.selectedIDs[0];
+		if (id < config.MaxCategoryId)
+			return;
+		
+		var item = FindItem(id, rootItem);
+		var parent = item.parent;
+		
+		var obj = EditorUtility.InstanceIDToObject(id) as ScriptableObject;
+		config.files.Remove(obj);
+		string assetPath = AssetDatabase.GetAssetPath(id);
+		AssetDatabase.DeleteAsset(assetPath);
+		
+		Reload();
+		var selected = new List<int> { parent.id };
+		//SetExpanded(selected);//parent.id, true);
+		SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
+	}
+	
+	public void Duplicate()
+	{
+		if (state.selectedIDs.Count == 0)
+			return;
+		
+		// Only duplicating first of the selection list.
+		if (state.selectedIDs[0] < config.MaxCategoryId)
+			return;
+		
+		string assetPath = AssetDatabase.GetAssetPath(state.selectedIDs[0]);
+		var duplicatePath = assetPath.Replace(".asset", "_copy.asset");
+		AssetDatabase.CopyAsset(assetPath, duplicatePath);
+		Object duplicateObject = AssetDatabase.LoadAssetAtPath(duplicatePath, typeof(Object));
+		config.files.Add(duplicateObject as ScriptableObject);
+		Reload();
+		var selected = new List<int> { duplicateObject.GetInstanceID() };
+		SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
 	}
 	
 	public Object[] GetSelectedObjects()
@@ -110,7 +170,7 @@ class DBEditorTreeView : TreeView
 		List<Object> selectedObjs = new List<Object>();
 		for (int i = 0; i < state.selectedIDs.Count; i++)
 		{
-			if (state.selectedIDs[i] < 100)
+			if (state.selectedIDs[i] < config.MaxCategoryId)
 				continue;
 			
 			Object obj = EditorUtility.InstanceIDToObject(state.selectedIDs[i]);

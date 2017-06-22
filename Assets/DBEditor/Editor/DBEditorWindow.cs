@@ -1,49 +1,39 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor.IMGUI.Controls;
 
 namespace DBEditor
 {
-	using UnityEditor.IMGUI.Controls;
-	public class SelectionHistoryWindow : EditorWindow
+	public class DBEditorWindow : EditorWindow
 	{
 		public DBEditorConfig config;
-		
-		private SelectionHistory selectionHistory;
-		private Vector2 scrollPosition;
-		private string searchString = "";
-		private bool someOption;
-		private GUISkin editorSkin;
-		private TreeViewState m_TreeViewState;
-		private SimpleTreeView m_SimpleTreeView;
+
+		private string _searchString;
+		private bool _inspectorLock;
+		private GUISkin _editorSkin;
+		private TreeViewState _treeViewState;
+		private DBEditorTreeView _dbEditorTreeView;
+		private Object[] _selected;
 
 		[MenuItem ("Window/DBEditor")]
 		static void Init()
 		{
-			// Get existing open window or if none, make a new one:
-//			var window = ScriptableObject.CreateInstance<SelectionHistoryWindow>();
-			var window = EditorWindow.GetWindow<SelectionHistoryWindow> ();
+			var window = EditorWindow.GetWindow<DBEditorWindow> ();
 			window.titleContent.text = "DBEditor";
 			window.Show();
 		}
 		
 		public void Awake()
 		{
-			if (m_TreeViewState == null)
-				m_TreeViewState = new TreeViewState ();
+			_searchString = "";
 			
-			m_SimpleTreeView = new SimpleTreeView(m_TreeViewState);
+			if (_treeViewState == null)
+				_treeViewState = new TreeViewState ();
 			
-			selectionHistory = new SelectionHistory();
-			selectionHistory.LoadDB(config);
-			
-			editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
-		}
+			_dbEditorTreeView = new DBEditorTreeView(_treeViewState, config);
 
-		void UpdateSelection(int currentIndex)
-		{
-			selectionHistory.UpdateSelection(currentIndex);
-			GUI.FocusControl(null);
+			_editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
 		}
 		
 		void OnGUI()
@@ -52,162 +42,95 @@ namespace DBEditor
 			
 			EditorGUILayout.BeginHorizontal();
 			
-			EditorGUILayout.BeginVertical(GUILayout.Width(220f));
+			EditorGUILayout.BeginVertical(GUILayout.Width(270f));
 			
 			GUILayout.FlexibleSpace();
-			GUI.Box(new Rect(10, 20, 200, 350), "");
-			m_SimpleTreeView.OnGUI(new Rect(10, 20, 200, 350));
+
+			_dbEditorTreeView.OnGUI(new Rect(10, 25, 250, position.height - 35));
 
 			EditorGUILayout.EndVertical();
-			
-			EditorGUILayout.BeginVertical(GUILayout.Width(100f));
-			GUILayout.Button("Pepa");
-			GUILayout.Button("Pepa");
-			GUILayout.Button("Pepa");
-			EditorGUILayout.EndVertical();
-			
-			bool changedBefore = GUI.changed;
 
-			//scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, false, true);
-			//bool changedAfter = GUI.changed;
-
-			//if (!changedBefore && changedAfter) {
-			//	Debug.Log ("changed");
-			//}
+			EditorGUILayout.BeginVertical();
 			
-			EditorGUILayout.BeginVertical(GUILayout.Width(250));
-
-			DrawHistory();
+			if (!_inspectorLock)
+				_selected = _dbEditorTreeView.GetSelectedObjects();
 			
-			EditorGUILayout.EndVertical();
-			
-			//EditorGUILayout.EndScrollView();
-			
-			EditorGUILayout.BeginVertical(/*GUILayout.Width(500f)*/);
-
-			var selected = selectionHistory.CurrentSelection;// as GameObject;
-			if (selected != null)
+			if (_selected != null)
 			{
-				Editor editor = Editor.CreateEditor(selected);
-				//editor.OnInspectorGUI();    
+				EditorGUILayout.BeginHorizontal(_editorSkin.FindStyle("ProjectBrowserTopBarBg"));
+				GUILayout.FlexibleSpace();
+				_inspectorLock = GUILayout.Toggle(_inspectorLock, "", _editorSkin.FindStyle("IN LockButton"));
+				GUILayout.Space(5);
+				EditorGUILayout.EndHorizontal();
+				
+				Editor editor = Editor.CreateEditor(_selected);
+				editor.DrawHeader();
 				editor.DrawDefaultInspector();
+				//editor.OnInspectorGUI(); 
 			}
 
 			EditorGUILayout.EndVertical();
 			
 			EditorGUILayout.EndHorizontal();
-			
-			EditorGUILayout.Space();
-
-			if (GUILayout.Button("Clear"))
-			{
-				selectionHistory.History.Clear();
-				Repaint();
-			}
 		}
 		
 		void DrawToolBar()
 		{
-			GUILayout.BeginHorizontal(editorSkin.FindStyle("Toolbar"));
+			GUILayout.BeginHorizontal(_editorSkin.FindStyle("Toolbar"));
 			
-			someOption = GUILayout.Toggle(someOption, "Toggle Me", EditorStyles.toolbarButton);
-			GUILayout.Button("DropDownBtn", EditorStyles.toolbarDropDown);
-			
-			if (selectionHistory.CurrentSelection != null)
+			if (GUILayout.Button("Expand All", _editorSkin.FindStyle("toolbarbutton")))
 			{
-				if (GUILayout.Button("Find in Project", editorSkin.FindStyle("toolbarbutton")))
+				_dbEditorTreeView.ExpandAll();
+			}
+			
+			if (GUILayout.Button("Collapse All", _editorSkin.FindStyle("toolbarbutton")))
+			{
+				_dbEditorTreeView.CollapseAll();
+			}	
+			
+			GUILayout.Button("Create New", EditorStyles.toolbarDropDown);
+			
+			var selected = _dbEditorTreeView.GetSelectedObjects();
+			if (selected != null)
+			{
+				if (GUILayout.Button("Find in Project", _editorSkin.FindStyle("toolbarbutton")))
 				{
-					EditorGUIUtility.PingObject(selectionHistory.CurrentSelection);
+					EditorGUIUtility.PingObject(selected[0]);
+				}
+				
+				if (GUILayout.Button("Rename", _editorSkin.FindStyle("toolbarbutton")))
+				{
+					_dbEditorTreeView.StartRename();
+				}
+				
+				if (GUILayout.Button("Duplicate", _editorSkin.FindStyle("toolbarbutton")))
+				{
+					_dbEditorTreeView.Duplicate();
+				}
+				
+				if (GUILayout.Button("Delete", _editorSkin.FindStyle("toolbarbutton")))
+				{
+					_dbEditorTreeView.Delete();
 				}
 			}
 			
 			GUILayout.FlexibleSpace();
 			
-			searchString = GUILayout.TextField(searchString, editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(100));
-			var editorStyle = string.IsNullOrEmpty(searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
-			if (GUILayout.Button("", editorSkin.FindStyle(editorStyle)))
+			_searchString = GUILayout.TextField(_searchString, _editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(140));
+			var editorStyle = string.IsNullOrEmpty(_searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
+			if (GUILayout.Button("", _editorSkin.FindStyle(editorStyle)))
 			{
-				searchString = "";
+				_searchString = "";
 				GUI.FocusControl(null);
 			}
 			
 			GUILayout.EndHorizontal();
 		}
-
-		void DrawHistory()
+		
+		protected void OnDestroy()
 		{
-			var nonSelectedColor = GUI.contentColor;
-			var history = selectionHistory.History;
-			var buttonStyle = editorSkin.GetStyle("Label");
-
-			for (int i = 0; i < history.Count; i++)
-			{
-				var historyElement = history [i];
-
-				if (selectionHistory.IsSelected(i))
-				{
-					GUI.contentColor = new Color(0.2f, 170.0f / 255.0f, 1.0f, 1.0f);
-				}
-				else
-				{
-					GUI.contentColor = nonSelectedColor;
-				}
-
-				var rect = EditorGUILayout.BeginHorizontal();
-
-				//if (historyElement == null) {
-				//	GUILayout.Label ("Deleted", buttonStyle); 
-				//} else {
-
-					var icon = AssetPreview.GetMiniThumbnail (historyElement);
-
-					GUIContent content = new GUIContent ();
-
-					content.image = icon;
-					content.text = historyElement.name;
-
-					// chnanged to label to be able to handle events for drag
-					GUILayout.Label (content, buttonStyle, GUILayout.Height(20)); 
-					GUI.contentColor = nonSelectedColor;
-					
-				EditorGUILayout.EndHorizontal ();
-
-				ButtonLogic (i, rect, historyElement);
-			}
-
-			GUI.contentColor = nonSelectedColor;
-		}
-
-		void ButtonLogic(int currentIndex, Rect rect, Object currentObject)
-		{
-			if (Event.current == null)
-				return;
-
-			if (!rect.Contains(Event.current.mousePosition))
-				return;
-			
-			if (currentObject == null)
-				return;
-			
-//			Debug.Log(string.Format("event:{0}", currentEvent.ToString()));
-
-			if (Event.current.type == EventType.MouseDrag)
-			{
-				DragAndDrop.PrepareStartDrag();
-				DragAndDrop.StartDrag(currentObject.name);
-				DragAndDrop.objectReferences = new Object[] { currentObject };
-
-				Event.current.Use();
-			}
-			else if (Event.current.type == EventType.MouseUp)
-			{
-				if (Event.current.button == 0)
-				{
-					UpdateSelection(currentIndex);
-				}
-
-				Event.current.Use();
-			}
+			//EditorUtility.UnloadUnusedAssetsImmediate();
+			//System.GC.Collect();
 		}
 	}
 }
