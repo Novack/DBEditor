@@ -47,6 +47,7 @@ namespace DBEditor
 			GUILayout.FlexibleSpace();
 
 			_dbEditorTreeView.OnGUI(new Rect(10, 25, 250, position.height - 35));
+			_dbEditorTreeView.searchString = _searchString;
 
 			EditorGUILayout.EndVertical();
 
@@ -91,7 +92,7 @@ namespace DBEditor
 			GUILayout.Button("Create New", EditorStyles.toolbarDropDown);
 			
 			var selected = _dbEditorTreeView.GetSelectedObjects();
-			if (selected != null)
+			if (selected != null && selected.Length == 1)
 			{
 				if (GUILayout.Button("Find in Project", _editorSkin.FindStyle("toolbarbutton")))
 				{
@@ -116,7 +117,7 @@ namespace DBEditor
 			
 			GUILayout.FlexibleSpace();
 			
-			_searchString = GUILayout.TextField(_searchString, _editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(140));
+			_searchString = GUILayout.TextField(_searchString, _editorSkin.FindStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(200));
 			var editorStyle = string.IsNullOrEmpty(_searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
 			if (GUILayout.Button("", _editorSkin.FindStyle(editorStyle)))
 			{

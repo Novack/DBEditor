@@ -16,6 +16,8 @@ class DBEditorTreeView : TreeView
 		Reload();
 	}
 	
+	#region TreeView Overrides
+	
 	protected override TreeViewItem BuildRoot()
 	{
 		var root = new TreeViewItem { id = 0, depth = -1, displayName = "Root" };
@@ -32,6 +34,7 @@ class DBEditorTreeView : TreeView
 		for (int i = 0; i < config.files.Count; i++)
 		{
 			var item = new TreeViewItem(config.files[i].GetInstanceID());
+			//Debug.Log(config.files[i].GetInstanceID());
 			item.displayName = config.files[i].name;
 			item.icon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
 			//item.icon = AssetPreview.GetMiniThumbnail(config.files[i]);
@@ -110,6 +113,10 @@ class DBEditorTreeView : TreeView
 		return true;
 	}
 	
+	#endregion
+	
+	#region Custom Methods
+	
 	public void StartRename()
 	{
 		if (state.selectedIDs.Count == 0)
@@ -148,11 +155,11 @@ class DBEditorTreeView : TreeView
 		if (state.selectedIDs.Count == 0)
 			return;
 		
-		// Only duplicating first of the selection list.
 		if (state.selectedIDs[0] < config.MaxCategoryId)
 			return;
 		
 		string assetPath = AssetDatabase.GetAssetPath(state.selectedIDs[0]);
+		// TODO: check for duplicate names.
 		var duplicatePath = assetPath.Replace(".asset", "_copy.asset");
 		AssetDatabase.CopyAsset(assetPath, duplicatePath);
 		Object duplicateObject = AssetDatabase.LoadAssetAtPath(duplicatePath, typeof(Object));
@@ -182,4 +189,6 @@ class DBEditorTreeView : TreeView
 		
 		return selectedObjs.ToArray();
 	}
+	
+	#endregion
 }
