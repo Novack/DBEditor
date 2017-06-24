@@ -15,6 +15,7 @@ namespace DBEditor
 		inspector attributes
 		custom inspectors
 		inspector scroll bar
+		investigate Save
 		*/
 		
 		[Serializable]
