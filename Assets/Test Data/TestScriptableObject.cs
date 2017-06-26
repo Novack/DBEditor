@@ -17,7 +17,9 @@ public class TestScriptableObject : ScriptableObject
 	
 	[HideInInspector]
 	public int none;
-	public float lala;
+    public float standardFloat;
+    [Range(0f, 1f)]
+    public float lala;
 	public List<int> lele;
 	public int[] lilo;
 	public string strele;
@@ -29,6 +31,25 @@ public class TestScriptableObject : ScriptableObject
 	public Vector3 vec;
 	[Tooltip("vervever")]
 	public marisco caracok;
-	
+    [Space(10)]
+    [Tooltip("Tests for custom Property Drawers")]
+    public MyPropertyType Field1;
+    [Space(10)]
+    [Tooltip("Tests for Custom Inspectors")]
+    public Transform trans;
+    [Space(10)]
+    [Tooltip("Tests for Custom Property Attributes")]
+    [Regex(@"^(?:\d{1,3}\.){3}\d{1,3}$", "Invalid IP address!\nExample: '127.0.0.1'")]
+    public string serverAddress = "192.168.0.1";
+    [Multiline()]
+    public string multilineString;
+    public string normalString;
+    [Localization(false)]
+    public string lockKey;
+    public string normalString2;
+    [Localization(true)]
+    public string lockKeyMultiline;
+    public int somethingElse;
+
 
 }

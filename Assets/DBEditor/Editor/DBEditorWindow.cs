@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using UnityEditor.IMGUI.Controls;
 
 namespace DBEditor
@@ -67,13 +66,14 @@ namespace DBEditor
 			if (_selected != null)
 			{
 				EditorGUILayout.BeginHorizontal(GetStyle("ProjectBrowserTopBarBg"));
-				GUILayout.FlexibleSpace();
+                GUILayout.FlexibleSpace();
 				_inspectorLock = GUILayout.Toggle(_inspectorLock, "", GetStyle("IN LockButton"));
 				GUILayout.Space(10);
 				EditorGUILayout.EndHorizontal();
 				
 				Editor editor = Editor.CreateEditor(_selected);
-				editor.DrawHeader();
+                //EditorGUILayout.InspectorTitlebar(true, _selected);
+                editor.DrawHeader();
 				editor.DrawDefaultInspector();
 				//editor.OnInspectorGUI(); 
 			}

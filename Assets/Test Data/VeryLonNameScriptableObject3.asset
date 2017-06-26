@@ -14,6 +14,7 @@ MonoBehaviour:
   testScriptableObject: {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca,
     type: 2}
   none: 0
+  standardFloat: 0
   lala: 3
   lele: 000000000000000000000000
   lilo: 00000000000000000000000000000000000000007d000000
@@ -24,3 +25,9 @@ MonoBehaviour:
   caracok:
     name: jhgjhg
     size: 0
+  Field1:
+    Value: 'fjdghjfg
+
+'
+  trans: {fileID: 0}
+  serverAddress: 192.168.0.1666
