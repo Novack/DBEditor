@@ -12,11 +12,9 @@ namespace DBEditor
 		load up new config
 		create new object
 		search options
-		inspector attributes
-		custom inspectors
 		inspector scroll bar
-		investigate Save
-		*/
+		Force Save
+		*/ 
 		
 		[Serializable]
 		public class Config

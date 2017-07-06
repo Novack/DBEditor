@@ -15,7 +15,7 @@ MonoBehaviour:
     type: 2}
   none: 0
   standardFloat: 0
-  lala: 2
+  lala: 0.848
   lele: 000000000000000000000000
   lilo: 00000000000000000000000000000000000000007d000000
   strele: iuyoiu2
@@ -30,4 +30,9 @@ MonoBehaviour:
 
 '
   trans: {fileID: 0}
-  serverAddress: 192.168.0.1
+  serverAddress: 192.168.0.1555
+  multilineString: 
+  normalString: 
+  lockKey: kjhgjhgjh
+  lockKeyMultiline: dfghfghfgh gfhdfhfgh
+  somethingElse: 0

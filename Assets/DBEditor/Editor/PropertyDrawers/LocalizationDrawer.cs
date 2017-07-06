@@ -5,10 +5,8 @@ using UnityEngine;
 public class LocalizationDrawer : PropertyDrawer
 {
     // These constants describe the height of the help box and the text field.
-    const float NormalHeight = 30f;
-    const float MultilineHeight = 50f;
     const float TextHeight = 16f;
-    const float SpaceHeight = 16f;
+	const float SeparatorHeight = 2f;
 
     // Provide easy access to the RegexAttribute for reading information from it.
     LocalizationAttribute localizationAttribute { get { return ((LocalizationAttribute)attribute); } }
@@ -17,20 +15,21 @@ public class LocalizationDrawer : PropertyDrawer
     public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
     {
         float baseHeight = base.GetPropertyHeight(prop, label);
-
-        if (localizationAttribute.isMultiline)
-            return baseHeight + MultilineHeight;
-        else
-            return baseHeight + NormalHeight;
+	    
+	    var height = TextHeight;
+	    if (localizationAttribute.isMultiline)
+		    height = TextHeight * 4;
+	    
+	    return baseHeight + height + SeparatorHeight;
     }
 
     // Here you can define the GUI for your property drawer. Called by Unity.
     public override void OnGUI(Rect position, SerializedProperty prop, GUIContent label)
     {
         // Draw the text field control GUI.
-        DrawTextField(position, prop, label);
+	    DrawTextField(position, prop, label);
 
-        //DrawLocalizedField(position, prop);
+        DrawLocalizedField(position, prop);
     }
 
     void DrawTextField(Rect position, SerializedProperty prop, GUIContent label)
@@ -38,28 +37,41 @@ public class LocalizationDrawer : PropertyDrawer
         Rect textFieldPosition = position;
         textFieldPosition.height = TextHeight;
         
-        EditorGUI.BeginChangeCheck();
-        //string value = EditorGUILayout.TextField(label, prop.stringValue);
-        string value = EditorGUI.TextField(textFieldPosition, prop.stringValue);
-        if (EditorGUI.EndChangeCheck())
-            prop.stringValue = value;
+	    EditorGUI.BeginChangeCheck();
+	    //GUI.SetNextControlName("user");
+	    string value = EditorGUI.TextField(textFieldPosition, label, prop.stringValue);
+	    
+	    if (EditorGUI.EndChangeCheck())
+	        prop.stringValue = value;
+	    
+	    // http://answers.unity3d.com/questions/41841/how-can-i-determine-when-user-presses-enter-in-an.html?_ga=2.61987756.1471278972.1499338231-1392953560.1496546406
+	    
+	    //if (Event.current.Equals(Event.KeyboardEvent("return")) && GUI.GetNameOfFocusedControl() == "user")
+		//    Debug.Log("Login");
+	    
+	    //Event e = Event.current;
+	    //if (e.type == EventType.keyDown && e.keyCode == KeyCode.Return)
+		//    Debug.Log("test");
     }
 
     void DrawLocalizedField(Rect position, SerializedProperty prop)
     {
-        Rect localizedPosition = EditorGUI.IndentedRect(position);        
+	    Rect localizedPosition = EditorGUI.IndentedRect(position);  
+	    localizedPosition.y = localizedPosition.y + TextHeight;
+	    localizedPosition.height = TextHeight;
 
         if (localizationAttribute.isMultiline)
         {
-            //localizedPosition.y += TextHeight;
-            EditorGUILayout.TextArea(GetTranslation(prop.stringValue));
-            //EditorGUI.TextArea(localizedPosition, GetTranslation(prop.stringValue));            
+        	EditorGUI.LabelField(localizedPosition, "Localized:");
+	        	
+	        localizedPosition.y = localizedPosition.y + TextHeight + SeparatorHeight;
+	        localizedPosition.height = TextHeight * 3;
+	        EditorGUI.TextArea(localizedPosition, GetTranslation(prop.stringValue));
         }
         else
-        {
-            //localizedPosition.y += TextHeight * 3;
-            //EditorGUI.TextField(localizedPosition, "Localized:", GetTranslation(prop.stringValue));
-            EditorGUILayout.TextField(GetTranslation(prop.stringValue));
+	    {
+	        localizedPosition.y = localizedPosition.y + SeparatorHeight;
+		    EditorGUI.TextField(localizedPosition, "Localized:", GetTranslation(prop.stringValue));
         }
     }
 

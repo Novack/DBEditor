@@ -42,11 +42,12 @@ public class TestScriptableObject : ScriptableObject
     [Regex(@"^(?:\d{1,3}\.){3}\d{1,3}$", "Invalid IP address!\nExample: '127.0.0.1'")]
     public string serverAddress = "192.168.0.1";
     [Multiline()]
-    public string multilineString;
-    public string normalString;
+	public string multilineString;
+	[Space(10)]
+	public string normalString;
+	[Header("Localization")]
     [Localization(false)]
     public string lockKey;
-    public string normalString2;
     [Localization(true)]
     public string lockKeyMultiline;
     public int somethingElse;
