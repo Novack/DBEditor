@@ -33,6 +33,6 @@ MonoBehaviour:
   serverAddress: 192.168.0.1555
   multilineString: 
   normalString: 
-  lockKey: kjhgjhgjh
+  lockKey: marcos
   lockKeyMultiline: dfghfghfgh gfhdfhfgh
   somethingElse: 0

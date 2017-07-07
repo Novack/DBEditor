@@ -32,14 +32,16 @@ public class LocalizationDrawer : PropertyDrawer
         DrawLocalizedField(position, prop);
     }
 
+	string value;
     void DrawTextField(Rect position, SerializedProperty prop, GUIContent label)
     {
         Rect textFieldPosition = position;
         textFieldPosition.height = TextHeight;
         
 	    EditorGUI.BeginChangeCheck();
-	    //GUI.SetNextControlName("user");
-	    string value = EditorGUI.TextField(textFieldPosition, label, prop.stringValue);
+	    GUI.SetNextControlName("user");
+	    if (EditorGUI.TextField(textFieldPosition, label, prop.stringValue).KeyPressed<string>("user", KeyCode.Return, out value))
+		    Debug.Log("test");
 	    
 	    if (EditorGUI.EndChangeCheck())
 	        prop.stringValue = value;
