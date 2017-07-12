@@ -29,9 +29,8 @@ MonoBehaviour:
     Value: 
   trans: {fileID: 0}
   serverAddress: 192.168.0.1
-  multilineString: 
+  multilineString: iuyiuyg
   normalString: 
   lockKey: gdfgsgf
-  normalString2: sfgsfdgdfg
   lockKeyMultiline: sdfgdgsdggdfsgfg
   somethingElse: 0

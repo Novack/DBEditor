@@ -31,3 +31,8 @@ MonoBehaviour:
 '
   trans: {fileID: 0}
   serverAddress: 192.168.0.1zcvbcb
+  multilineString: 
+  normalString: 
+  lockKey: uuyg
+  lockKeyMultiline: ftyfuyu
+  somethingElse: 0
