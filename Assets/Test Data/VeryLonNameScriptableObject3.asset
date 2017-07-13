@@ -33,6 +33,6 @@ MonoBehaviour:
   serverAddress: 192.168.0.1666
   multilineString: 
   normalString: 
-  lockKey: 65454545
+  lockKey: maria
   lockKeyMultiline: 5454654546545545465
   somethingElse: 0
