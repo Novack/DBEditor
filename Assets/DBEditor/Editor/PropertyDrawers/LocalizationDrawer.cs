@@ -72,13 +72,11 @@ public class LocalizationDrawer : PropertyDrawer
 	    }
 	    
 	    if (EditorGUI.EndChangeCheck())
-		    Debug.Log(_translatedValue);
+		    SetTranslation(prop.stringValue);
     }
 
     private string GetTranslation(string locKey)
     {
-	    string[] localizationDemo = new string[]{"pepe", "juan", "largo\nmultilinea", "algo mas"};
-	    
 	    int key;
 	    bool keyParsed = int.TryParse(locKey, out key);
 	    if (keyParsed && key < localizationDemo.Length)
@@ -86,4 +84,14 @@ public class LocalizationDrawer : PropertyDrawer
 	    
 	    return "Loc key not found";
     }
+	
+	private string[] localizationDemo = new string[]{"pepe", "juan", "largo\nmultilinea", "algo mas"};
+	
+	private void SetTranslation(string locKey)
+	{
+		int key;
+		bool keyParsed = int.TryParse(locKey, out key);
+		if (keyParsed && key < localizationDemo.Length)
+			localizationDemo[key] = _translatedValue;
+	}
 }

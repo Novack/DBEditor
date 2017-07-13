@@ -29,3 +29,8 @@ MonoBehaviour:
     Value: 
   trans: {fileID: 4234780636339932, guid: de4da6fae8c7c624c84e93ade32b28e3, type: 2}
   serverAddress: 192.168.0.1czvbcxcvbx
+  multilineString: 
+  normalString: 
+  lockKey: 1
+  lockKeyMultiline: 2
+  somethingElse: 0
