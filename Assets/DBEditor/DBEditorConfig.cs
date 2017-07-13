@@ -24,7 +24,7 @@ namespace DBEditor
 			[Tooltip("The parent category structure for this files. Use '/' to nest.")]
 			public string TreeViewPath;
 			[Tooltip("The path to the folder to contain newly created objects of this category. 'Assets/...'")]
-			public string FileStoragePath;
+			public string FileStoragePath = "Assets/...";
 			[Tooltip("The ScriptableObject instances to include manually.")]
 			public List<ScriptableObject> Files;
 		}
