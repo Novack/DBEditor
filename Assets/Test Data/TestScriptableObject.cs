@@ -50,7 +50,9 @@ public class TestScriptableObject : ScriptableObject
     public string lockKey;
     [Localization(true)]
     public string lockKeyMultiline;
-    public int somethingElse;
+	public int somethingElse;
+	[Time]
+	public float myTimeTest;
 
 
 }
