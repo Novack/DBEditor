@@ -42,7 +42,8 @@ namespace DBEditor
 			
 			return style;
 		}
-		
+
+        Vector2 _scrollPos;
 		void OnGUI()
 		{
 			DrawToolBar();
@@ -58,11 +59,11 @@ namespace DBEditor
 
 			EditorGUILayout.EndVertical();
 
-			EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginVertical();
 			
 			if (!_inspectorLock)
-				_selected = _dbEditorTreeView.GetSelectedObjects();
-			
+				_selected = _dbEditorTreeView.GetSelectedObjects();			
+
 			if (_selected != null)
 			{
 				EditorGUILayout.BeginHorizontal(GetStyle("ProjectBrowserTopBarBg"));
@@ -71,16 +72,21 @@ namespace DBEditor
 				GUILayout.Space(10);
 				EditorGUILayout.EndHorizontal();
 				
+                _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+
 				Editor editor = Editor.CreateEditor(_selected);
                 //EditorGUILayout.InspectorTitlebar(true, _selected);
                 editor.DrawHeader();
 				editor.DrawDefaultInspector();
-				//editor.OnInspectorGUI(); 
+                //editor.OnInspectorGUI(); 
+                GUILayout.Space(30);
+
+                EditorGUILayout.EndScrollView();
 			}
 
 			EditorGUILayout.EndVertical();
-			
-			EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndHorizontal();
 		}
 		
 		void DrawToolBar()

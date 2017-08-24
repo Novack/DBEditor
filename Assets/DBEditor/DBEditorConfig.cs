@@ -12,7 +12,6 @@ namespace DBEditor
 		load up new config
 		create new object
 		search options
-		inspector scroll bar
 		Force Save
 		*/ 
 		
