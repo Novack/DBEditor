@@ -8,12 +8,20 @@ class DBEditorTreeView : TreeView
 {
 	private DBEditorConfig config;
 	private int _currentCatId;
+    private Texture2D _folderIcon;
+    private Texture2D _folderEmptyIcon;
+    private Texture2D _scriptableObjectIcon;
+    public Dictionary<int, int> _configIdxById;
 
-	public DBEditorTreeView(TreeViewState treeViewState, DBEditorConfig configParam) : base(treeViewState)
+    public DBEditorTreeView(TreeViewState treeViewState, DBEditorConfig configParam) : base(treeViewState)
 	{
 		config = configParam;
 		showBorder = true;
-		Reload();
+        _folderIcon = EditorGUIUtility.FindTexture("Folder Icon");
+        _folderEmptyIcon = EditorGUIUtility.FindTexture("FolderEmpty Icon");
+        _scriptableObjectIcon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
+
+        Reload();
 	}
 	
 	#region TreeView Overrides
@@ -21,26 +29,58 @@ class DBEditorTreeView : TreeView
 	protected override TreeViewItem BuildRoot()
 	{
 		var root = new TreeViewItem { id = 0, depth = -1, displayName = "Root" };
-		
-		_currentCatId = 1;
-		
-		var pepe = new TreeViewItem(_currentCatId);
-		pepe.displayName = "pepito";
-		pepe.icon = EditorGUIUtility.FindTexture("Folder Icon");
-		_currentCatId++;
 
-		root.AddChild(pepe);	
-		
-		for (int i = 0; i < config.files.Count; i++)
-		{
-			var item = new TreeViewItem(config.files[i].GetInstanceID());
-			//Debug.Log(config.files[i].GetInstanceID());
-			item.displayName = config.files[i].name;
-			item.icon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
-			//item.icon = AssetPreview.GetMiniThumbnail(config.files[i]);
-			pepe.AddChild(item);
-		}
-		
+        _currentCatId = 1;
+        _configIdxById = new Dictionary<int, int>(); // store the config.Configs index for item meta data lookups (path, classname, etc).
+        TreeViewItem treeCategory;
+        TreeViewItem cachedCategory = root;
+        for (int i = 0; i < config.Configs.Count; i++)
+        {
+            cachedCategory = root;
+            var pathArray = (config.Configs[i].TreeViewPath).Split('/');
+            for (int p = 0; p < pathArray.Length; p++)
+            {
+                if (cachedCategory.children != null)
+                {
+                    var existing = cachedCategory.children.Find(x => x.displayName == pathArray[p]);
+                    if (existing != null)
+                    {
+                        cachedCategory = existing;
+                        continue;
+                    }
+                }
+
+                treeCategory = new TreeViewItem(_currentCatId);
+                treeCategory.displayName = pathArray[p];
+                treeCategory.icon = _folderIcon;
+                _configIdxById.Add(_currentCatId, i); 
+                _currentCatId++;
+
+                cachedCategory.AddChild(treeCategory);
+                cachedCategory = treeCategory;
+            }
+
+            for (int j = 0; j < config.Configs[i].Files.Count; j++)
+            {
+                if (config.Configs[i].Files[j] == null)
+                {
+                    UnityEngine.Debug.LogWarningFormat("Missing element expected in config item {0} ({1}), at index position {2}.", i, config.Configs[i].ClassName, j);
+                    continue;
+                }
+                var id = config.Configs[i].Files[j].GetInstanceID();
+                var item = new TreeViewItem(id);
+                if (_configIdxById.ContainsKey(id))
+                {
+                    UnityEngine.Debug.LogWarningFormat("Element {0} with id {1} already exist in the database. Ignoring add at category {2}.", config.Configs[i].Files[j].name, id, config.Configs[i].TreeViewPath);
+                    continue;
+                }
+                _configIdxById.Add(id, i);
+                //Debug.Log(config.files[i].GetInstanceID());
+                item.displayName = config.Configs[i].Files[j].name;
+                item.icon = _scriptableObjectIcon; // AssetPreview.GetMiniThumbnail(config.files[i]);
+                cachedCategory.AddChild(item);
+            }
+        }		
 		
 		SetupDepthsFromParentsAndChildren(root);
 			
@@ -69,9 +109,13 @@ class DBEditorTreeView : TreeView
 	
 	protected override void SetupDragAndDrop(SetupDragAndDropArgs args)
 	{
-		DragAndDrop.PrepareStartDrag();
+        var selection = GetSelectedObjects();
+        if (selection == null)
+            return;
+
+        DragAndDrop.PrepareStartDrag();
 		DragAndDrop.StartDrag("DBEditorDrag");
-		DragAndDrop.objectReferences = GetSelectedObjects();
+        DragAndDrop.objectReferences = selection;
 	}
 	
 	protected override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
@@ -104,11 +148,11 @@ class DBEditorTreeView : TreeView
 	{
 		if (item.id > config.MaxCategoryId)
 			return false;
-		
-		if (IsExpanded(item.id))
-			item.icon = EditorGUIUtility.FindTexture("FolderEmpty Icon");
-		else
-			item.icon = EditorGUIUtility.FindTexture("Folder Icon");
+
+        if (IsExpanded(item.id))
+            item.icon = _folderEmptyIcon;
+        else
+            item.icon = _folderIcon;
 		
 		return true;
 	}
@@ -138,9 +182,10 @@ class DBEditorTreeView : TreeView
 		
 		var item = FindItem(id, rootItem);
 		var parent = item.parent;
-		
-		var obj = EditorUtility.InstanceIDToObject(id) as ScriptableObject;
-		config.files.Remove(obj);
+
+        var obj = EditorUtility.InstanceIDToObject(id) as ScriptableObject;
+        var idx = _configIdxById[id];
+        config.Configs[idx].Files.Remove(obj);
 		string assetPath = AssetDatabase.GetAssetPath(id);
 		AssetDatabase.DeleteAsset(assetPath);
 		
@@ -157,16 +202,29 @@ class DBEditorTreeView : TreeView
 		
 		if (state.selectedIDs[0] < config.MaxCategoryId)
 			return;
-		
-		string assetPath = AssetDatabase.GetAssetPath(state.selectedIDs[0]);
-		// TODO: check for duplicate names.
-		var duplicatePath = assetPath.Replace(".asset", "_copy.asset");
-		AssetDatabase.CopyAsset(assetPath, duplicatePath);
-		Object duplicateObject = AssetDatabase.LoadAssetAtPath(duplicatePath, typeof(Object));
-		config.files.Add(duplicateObject as ScriptableObject);
-		Reload();
-		var selected = new List<int> { duplicateObject.GetInstanceID() };
-		SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
+
+        // Duplicate only the first if sleected more than one:
+        var id = state.selectedIDs[0];
+        if (id < config.MaxCategoryId)
+            return;
+
+        string assetPath = AssetDatabase.GetAssetPath(id);
+        // TODO: check for duplicate names.
+        var duplicatePath = assetPath.Replace(".asset", "_copy.asset");
+        if (AssetDatabase.CopyAsset(assetPath, duplicatePath))
+        {
+            Object duplicateObject = AssetDatabase.LoadAssetAtPath(duplicatePath, typeof(Object));
+            var idx = _configIdxById[id];
+            config.Configs[idx].Files.Add(duplicateObject as ScriptableObject);
+
+            Reload();
+            var selected = new List<int> { duplicateObject.GetInstanceID() };
+            SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning("Error, file could not be duplicated.");
+        }
 	}
 	
 	public Object[] GetSelectedObjects()

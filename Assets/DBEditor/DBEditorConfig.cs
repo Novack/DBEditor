@@ -30,7 +30,6 @@ namespace DBEditor
 		
 		
 		public int MaxCategoryId = 10000;
-		public List<ScriptableObject> files;
 		
 		public List<Config> Configs;
 	}
