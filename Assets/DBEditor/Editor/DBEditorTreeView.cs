@@ -91,7 +91,7 @@ class DBEditorTreeView : TreeView
 	{
 		if (args.draggedItem != null)
 		{
-			if (args.draggedItem.id < config.MaxCategoryId)
+			if (Mathf.Abs(args.draggedItem.id) < config.MaxCategoryId)
 				return false;
 		}
 		
@@ -99,7 +99,7 @@ class DBEditorTreeView : TreeView
 		{
 			for (int i = 0; i < args.draggedItemIDs.Count; i++)
 			{
-				if (args.draggedItemIDs[i] < config.MaxCategoryId)
+				if (Mathf.Abs(args.draggedItemIDs[i]) < config.MaxCategoryId)
 					return false;
 			}
 		}
@@ -125,7 +125,7 @@ class DBEditorTreeView : TreeView
 	
 	protected override bool CanRename(TreeViewItem item)
 	{
-		if (item.id < config.MaxCategoryId)
+		if (Mathf.Abs(item.id) < config.MaxCategoryId)
 			return false;
 		
 		return true;
@@ -146,15 +146,11 @@ class DBEditorTreeView : TreeView
 	
 	protected override bool CanChangeExpandedState(TreeViewItem item)
 	{
-		if (item.id > config.MaxCategoryId)
+		if (Mathf.Abs(item.id) > config.MaxCategoryId)
 			return false;
 
-        if (IsExpanded(item.id))
-            item.icon = _folderEmptyIcon;
-        else
-            item.icon = _folderIcon;
-		
-		return true;
+        item.icon = IsExpanded(item.id) ? _folderEmptyIcon : _folderIcon;
+        return true;
 	}
 	
 	#endregion
@@ -163,7 +159,23 @@ class DBEditorTreeView : TreeView
 	
     public void CreateNewElement(object configIndex)
     {
-        UnityEngine.Debug.LogFormat("Create new element of type {0}", config.Configs[(int)configIndex].ClassName);
+        var idx = (int)configIndex;
+        var className = config.Configs[idx].ClassName;
+
+        var path = AssetDatabase.GenerateUniqueAssetPath(string.Format("{0}/{1}.asset", config.Configs[idx].FileStoragePath, className));
+        var obj = ScriptableObject.CreateInstance(className);
+        
+        AssetDatabase.CreateAsset(obj, path);
+        AssetDatabase.SaveAssets();        
+
+        var id = obj.GetInstanceID();
+        config.Configs[idx].Files.Add(obj);
+
+        Reload();
+        var selected = new List<int> { id };
+        SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
+
+        //UnityEngine.Debug.LogFormat("Created new element of type {0}, id: {1}", className, id);
     }
 
     public List<string> GetElementTypes()
@@ -193,7 +205,7 @@ class DBEditorTreeView : TreeView
 		
 		// Only deleting first of the selection list.
 		int id = state.selectedIDs[0];
-		if (id < config.MaxCategoryId)
+		if (Mathf.Abs(id) < config.MaxCategoryId)
 			return;
 		
 		var item = FindItem(id, rootItem);
@@ -215,18 +227,14 @@ class DBEditorTreeView : TreeView
 	{
 		if (state.selectedIDs.Count == 0)
 			return;
-		
-		if (state.selectedIDs[0] < config.MaxCategoryId)
-			return;
 
-        // Duplicate only the first if sleected more than one:
+        // Duplicate only the first if selected more than one:
         var id = state.selectedIDs[0];
-        if (id < config.MaxCategoryId)
+        if (Mathf.Abs(id) < config.MaxCategoryId)
             return;
 
         string assetPath = AssetDatabase.GetAssetPath(id);
-        // TODO: check for duplicate names.
-        var duplicatePath = assetPath.Replace(".asset", "_copy.asset");
+        var duplicatePath = AssetDatabase.GenerateUniqueAssetPath(assetPath);
         if (AssetDatabase.CopyAsset(assetPath, duplicatePath))
         {
             Object duplicateObject = AssetDatabase.LoadAssetAtPath(duplicatePath, typeof(Object));
@@ -251,7 +259,7 @@ class DBEditorTreeView : TreeView
 		List<Object> selectedObjs = new List<Object>();
 		for (int i = 0; i < state.selectedIDs.Count; i++)
 		{
-			if (state.selectedIDs[i] < config.MaxCategoryId)
+			if (Mathf.Abs(state.selectedIDs[i]) < config.MaxCategoryId)
 				continue;
 			
 			Object obj = EditorUtility.InstanceIDToObject(state.selectedIDs[i]);

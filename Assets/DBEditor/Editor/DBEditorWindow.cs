@@ -139,8 +139,8 @@ namespace DBEditor
 					_dbEditorTreeView.Delete();
 				}
 			}
-			
-			GUILayout.FlexibleSpace();
+
+            GUILayout.FlexibleSpace();
 			
 			_searchString = GUILayout.TextField(_searchString, GetStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(200));
 			var editorStyle = string.IsNullOrEmpty(_searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
@@ -149,7 +149,14 @@ namespace DBEditor
 				_searchString = "";
 				GUI.FocusControl(null);
 			}
+
+            GUILayout.Space(10);
 			
+            if (GUILayout.Button("Reload", GetStyle("toolbarbutton")))
+            {
+                _dbEditorTreeView.Reload();
+            }
+
 			GUILayout.EndHorizontal();
 		}
 		

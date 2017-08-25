@@ -27,17 +27,3 @@ MonoBehaviour:
     FileStoragePath: Assets/DBEditor
     Files:
     - {fileID: 11400000}
-  - ClassName: TestScriptableObject
-    TreeViewPath: something/this/pepe
-    FileStoragePath: Assets/Test Data
-    Files:
-    - {fileID: 11400000, guid: 056e27d66ff49cb4e89f08e4d2d6b5b1, type: 2}
-  - ClassName: TestScriptableObject
-    TreeViewPath: something/other
-    FileStoragePath: Assets/Test Data
-    Files:
-    - {fileID: 0}
-  - ClassName: TestScriptableObject
-    TreeViewPath: empty/something
-    FileStoragePath: Assets/DBEditor
-    Files: []
