@@ -13,9 +13,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxCategoryId: 1000
   Configs:
-  - ClassName: TestScriptableObject
+  - FileStoragePath: Assets/Test Data
+    ClassName: TestScriptableObject
     TreeViewPath: something/this
-    FileStoragePath: Assets/Test Data
     Files:
     - {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca, type: 2}
     - {fileID: 11400000, guid: 69d6437e80d5acb479d6a1154bd11cd4, type: 2}
@@ -23,12 +23,12 @@ MonoBehaviour:
     - {fileID: 11400000, guid: bd60177cf5f101844b2e02a921533c41, type: 2}
     - {fileID: 11400000, guid: ce7651dbc61edf047971ea94c83bb465, type: 2}
     - {fileID: 11400000, guid: 20e81fd204671ef439c82b7e87bc35a7, type: 2}
-  - ClassName: DBEditorConfig
+  - FileStoragePath: Assets/DBEditor
+    ClassName: DBEditorConfig
     TreeViewPath: DBEditorConfig
-    FileStoragePath: Assets/DBEditor
     Files:
     - {fileID: 11400000}
-  - ClassName: 
+  - FileStoragePath: Assets/DBEditor
+    ClassName: 
     TreeViewPath: category/without/class
-    FileStoragePath: Assets/DBEditor
     Files: []
