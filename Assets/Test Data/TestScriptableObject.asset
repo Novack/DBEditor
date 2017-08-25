@@ -9,31 +9,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc0e419aa55d854478225f6c2ca4d080, type: 3}
-  m_Name: VeryLonNameScriptableObject2
+  m_Name: TestScriptableObject
   m_EditorClassIdentifier: 
-  testScriptableObject: {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca,
-    type: 2}
+  testScriptableObject: {fileID: 0}
   none: 0
   standardFloat: 0
-  lala: 0.848
-  lele: 000000000000000000000000
-  lilo: 00000000000000000000000000000000000000007d000000
-  strele: iuyoiu2
+  lala: 0
+  lele: 
+  lilo: 
+  strele: 
   MyTextArea: 
-  col: {r: 0.36634946, g: 0.8897059, b: 0.69480085, a: 1}
+  col: {r: 0, g: 0, b: 0, a: 0}
   vec: {x: 0, y: 0, z: 0}
   caracok:
-    name: jhgjhg
+    name: 
     size: 0
   Field1:
-    Value: 'fjdghjfg
-
-'
+    Value: 
   trans: {fileID: 0}
-  serverAddress: 192.168.0.1555
+  serverAddress: 192.168.0.1
   multilineString: 
   normalString: 
-  lockKey: marcos
-  lockKeyMultiline: 2
+  lockKey: 
+  lockKeyMultiline: 
   somethingElse: 0
-  myTimeTest: 4619.101
+  myTimeTest: 0

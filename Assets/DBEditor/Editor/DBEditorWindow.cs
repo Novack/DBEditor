@@ -109,20 +109,24 @@ namespace DBEditor
 			if (GUILayout.Button("Collapse All", GetStyle("toolbarbutton")))
 			{
 				_dbEditorTreeView.CollapseAll();
-			}			
-            
-			if (GUILayout.Button("Create New", GetStyle("toolbarDropDown")))
+			}
+
+            GUILayout.Space(10);
+
+            if (GUILayout.Button("Create New", GetStyle("toolbarDropDown")))
             {
                 _createMenu.DropDown(new Rect(140f, -83f, 50f, 100f));
+            }
+
+            if (GUILayout.Button("Save All", GetStyle("toolbarbutton")))
+            {
+                _dbEditorTreeView.Save();
             }
 
             var selected = _dbEditorTreeView.GetSelectedObjects();
 			if (selected != null && selected.Length == 1)
 			{
-				if (GUILayout.Button("Find in Project", GetStyle("toolbarbutton")))
-				{
-					EditorGUIUtility.PingObject(selected[0]);
-				}
+                GUILayout.Space(15);
 				
 				if (GUILayout.Button("Rename", GetStyle("toolbarbutton")))
 				{
@@ -137,6 +141,13 @@ namespace DBEditor
 				if (GUILayout.Button("Delete", GetStyle("toolbarbutton")))
 				{
 					_dbEditorTreeView.Delete();
+				}
+
+                GUILayout.Space(5);
+
+                if (GUILayout.Button("Find in Project", GetStyle("toolbarbutton")))
+				{
+					EditorGUIUtility.PingObject(selected[0]);
 				}
 			}
 

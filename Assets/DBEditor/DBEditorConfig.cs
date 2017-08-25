@@ -7,13 +7,7 @@ namespace DBEditor
 {
 	[CreateAssetMenu()]
 	public class DBEditorConfig : ScriptableObject
-	{
-		/* TODO
-		create new object
-		search options
-		Force Save
-		*/ 
-		
+	{		
 		[Serializable]
 		public class Config
 		{

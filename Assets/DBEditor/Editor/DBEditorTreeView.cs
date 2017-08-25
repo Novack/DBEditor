@@ -223,6 +223,11 @@ class DBEditorTreeView : TreeView
 		SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
 	}
 	
+    public void Save()
+    {
+        AssetDatabase.SaveAssets();
+    }
+
 	public void Duplicate()
 	{
 		if (state.selectedIDs.Count == 0)
