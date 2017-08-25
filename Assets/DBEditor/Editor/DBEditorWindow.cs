@@ -32,6 +32,11 @@ namespace DBEditor
 			
 			_dbEditorTreeView = new DBEditorTreeView(_treeViewState, config);
 
+            LoadCreateMenu();
+        }
+
+        private void LoadCreateMenu()
+        {
             var possibleElements = _dbEditorTreeView.GetElementTypes();
             _createMenu = new GenericMenu();
             for (int i = 0; i < possibleElements.Count; i++)
@@ -166,6 +171,7 @@ namespace DBEditor
             if (GUILayout.Button("Reload", GetStyle("toolbarbutton")))
             {
                 _dbEditorTreeView.Reload();
+                LoadCreateMenu();
             }
 
 			GUILayout.EndHorizontal();
