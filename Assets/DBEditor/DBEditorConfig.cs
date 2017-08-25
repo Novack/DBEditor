@@ -9,7 +9,6 @@ namespace DBEditor
 	public class DBEditorConfig : ScriptableObject
 	{
 		/* TODO
-		load up new config
 		create new object
 		search options
 		Force Save

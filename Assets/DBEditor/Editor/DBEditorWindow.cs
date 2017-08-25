@@ -13,8 +13,9 @@ namespace DBEditor
 		private TreeViewState _treeViewState;
 		private DBEditorTreeView _dbEditorTreeView;
 		private Object[] _selected;
+        private GenericMenu _createMenu;
 
-		[MenuItem ("Window/DBEditor")]
+        [MenuItem ("Window/DBEditor")]
 		static void Init()
 		{
 			var window = EditorWindow.GetWindow<DBEditorWindow> ();
@@ -30,7 +31,14 @@ namespace DBEditor
 				_treeViewState = new TreeViewState ();
 			
 			_dbEditorTreeView = new DBEditorTreeView(_treeViewState, config);
-		}
+
+            var possibleElements = _dbEditorTreeView.GetElementTypes();
+            _createMenu = new GenericMenu();
+            for (int i = 0; i < possibleElements.Count; i++)
+            {
+                _createMenu.AddItem(new GUIContent(possibleElements[i]), false, _dbEditorTreeView.CreateNewElement, i);
+            }
+        }
 		
 		//private GUISkin _editorSkin;
 		private GUIStyle GetStyle(string name)
@@ -101,11 +109,14 @@ namespace DBEditor
 			if (GUILayout.Button("Collapse All", GetStyle("toolbarbutton")))
 			{
 				_dbEditorTreeView.CollapseAll();
-			}	
-			
-			GUILayout.Button("Create New", GetStyle("toolbarDropDown"));
-			
-			var selected = _dbEditorTreeView.GetSelectedObjects();
+			}			
+            
+			if (GUILayout.Button("Create New", GetStyle("toolbarDropDown")))
+            {
+                _createMenu.DropDown(new Rect(140f, -83f, 50f, 100f));
+            }
+
+            var selected = _dbEditorTreeView.GetSelectedObjects();
 			if (selected != null && selected.Length == 1)
 			{
 				if (GUILayout.Button("Find in Project", GetStyle("toolbarbutton")))
