@@ -22,8 +22,13 @@ MonoBehaviour:
     - {fileID: 11400000, guid: c3650aedc28322b45a37a3ab6479ad08, type: 2}
     - {fileID: 11400000, guid: bd60177cf5f101844b2e02a921533c41, type: 2}
     - {fileID: 11400000, guid: ce7651dbc61edf047971ea94c83bb465, type: 2}
+    - {fileID: 11400000, guid: 20e81fd204671ef439c82b7e87bc35a7, type: 2}
   - ClassName: DBEditorConfig
     TreeViewPath: DBEditorConfig
     FileStoragePath: Assets/DBEditor
     Files:
     - {fileID: 11400000}
+  - ClassName: 
+    TreeViewPath: category/without/class
+    FileStoragePath: Assets/DBEditor
+    Files: []

@@ -183,7 +183,8 @@ class DBEditorTreeView : TreeView
         var elements = new List<string>();
         for (int i = 0; i < config.Configs.Count; i++)
         {
-            elements.Add(config.Configs[i].ClassName);
+            if (!string.IsNullOrEmpty(config.Configs[i].ClassName))
+                elements.Add(config.Configs[i].ClassName);
         }
 
         return elements;
