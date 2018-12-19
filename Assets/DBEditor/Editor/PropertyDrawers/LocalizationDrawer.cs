@@ -63,7 +63,8 @@ public class LocalizationDrawer : PropertyDrawer
         	EditorGUI.LabelField(localizedPosition, "Localized:");	        	
 	        localizedPosition.y = localizedPosition.y + TEXT_HEIGHT + SEPARATOR_HEIGHT;
 	        localizedPosition.height = TEXT_HEIGHT * 3;
-            _translatedValue = EditorGUI.TextArea(localizedPosition, _translatedValue);            
+            _translatedValue = EditorGUI.TextArea(localizedPosition, _translatedValue);
+            EditorStyles.textField.wordWrap = true;
         }
         else
 	    {
@@ -72,26 +73,48 @@ public class LocalizationDrawer : PropertyDrawer
 	    }
 	    
 	    if (EditorGUI.EndChangeCheck())
-		    SetTranslation(prop.stringValue);
+		    SetTranslation(prop.stringValue, _translatedValue);
     }
 
     private string GetTranslation(string locKey)
     {
-	    int key;
-	    bool keyParsed = int.TryParse(locKey, out key);
-	    if (keyParsed && key < localizationDemo.Length)
-		    return localizationDemo[key];
-	    
-	    return "Loc key not found";
+        if (string.IsNullOrEmpty(locKey))
+            return "";
+
+        //return LocalizationManager.GetTranslation(locKey);
+        return locKey;
     }
-	
-	private string[] localizationDemo = new string[]{"pepe", "juan", "largo\nmultilinea", "algo mas"};
-	
-	private void SetTranslation(string locKey)
+
+    private void SetTranslation(string locKey, string translation)
 	{
-		int key;
-		bool keyParsed = int.TryParse(locKey, out key);
-		if (keyParsed && key < localizationDemo.Length)
-			localizationDemo[key] = _translatedValue;
-	}
+        if (string.IsNullOrEmpty(locKey))
+            return;
+
+        if (_localizationAttribute.isReadOnly)
+            return;
+
+        locKey = locKey.Trim();
+
+        /*
+        if (!string.IsNullOrEmpty(locKey))
+        {
+            var source = LocalizationManager.GetSourceContaining(locKey);
+            var enIdx = source.GetLanguageIndexFromCode("en");
+            var termData = source.GetTermData(locKey);
+            var english = termData != null ? termData.Languages[enIdx] : "";
+            var newEnglish = translation;
+
+            if (english != newEnglish)
+            {
+                if (termData == null)
+                {
+                    termData = source.AddTerm(locKey);
+                }
+
+                termData.Languages[enIdx] = newEnglish;
+                EditorUtility.SetDirty(source);
+            }
+        }
+        */
+    }
 }

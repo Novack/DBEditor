@@ -2,9 +2,10 @@
 
 public class TimeAttribute : PropertyAttribute
 {
+    public readonly bool useMiliseconds;
 
-	public TimeAttribute()
+    public TimeAttribute(bool useMiliseconds = false)
 	{
-		
+        this.useMiliseconds = useMiliseconds;
     }
 }

@@ -3,7 +3,7 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -12,23 +12,22 @@ MonoBehaviour:
   m_Name: DBEditor Config
   m_EditorClassIdentifier: 
   MaxCategoryId: 1000
+  LabelWidth: 220
   Configs:
-  - TreeViewPath: something/this
-    FileStoragePath: Assets/Test Data
+  - TreeViewPath: Test Data
+    FileStoragePath: 
     ClassName: TestScriptableObject
+    AutoScan: 1
     Files:
+    - {fileID: 11400000, guid: 20e81fd204671ef439c82b7e87bc35a7, type: 2}
     - {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca, type: 2}
     - {fileID: 11400000, guid: 69d6437e80d5acb479d6a1154bd11cd4, type: 2}
     - {fileID: 11400000, guid: c3650aedc28322b45a37a3ab6479ad08, type: 2}
     - {fileID: 11400000, guid: bd60177cf5f101844b2e02a921533c41, type: 2}
     - {fileID: 11400000, guid: ce7651dbc61edf047971ea94c83bb465, type: 2}
-    - {fileID: 11400000, guid: 20e81fd204671ef439c82b7e87bc35a7, type: 2}
-  - TreeViewPath: DBEditorConfig
-    FileStoragePath: Assets/DBEditor
-    ClassName: DBEditorConfig
+  - TreeViewPath: Configuration
+    FileStoragePath: 
+    ClassName: 
+    AutoScan: 0
     Files:
     - {fileID: 11400000}
-  - TreeViewPath: category/without/class
-    FileStoragePath: Assets/DBEditor
-    ClassName: 
-    Files: []

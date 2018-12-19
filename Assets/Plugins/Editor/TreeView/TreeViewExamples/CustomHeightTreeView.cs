@@ -36,7 +36,7 @@ namespace UnityEditor.TreeViewExamples
 		public override void OnGUI (Rect rect)
 		{
 			// Background
-			if (Event.current.type == EventType.repaint)
+			if (Event.current.type == EventType.Repaint)
 				DefaultStyles.backgroundOdd.Draw(rect, false, false, false, false);
 
 			// TreeView
@@ -73,7 +73,7 @@ namespace UnityEditor.TreeViewExamples
 
 		void DrawItemBackground (Rect bgRect)
 		{
-			if (Event.current.type == EventType.repaint)
+			if (Event.current.type == EventType.Repaint)
 			{
 				var rect = bgRect;
 				rect.height = Styles.headerBackground.fixedHeight;
