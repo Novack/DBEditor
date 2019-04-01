@@ -102,7 +102,7 @@ class DBEditorTreeView : TreeView
                     continue;
                 }
                 _configIdxById.Add(id, i);
-                //if (TU.Constants.LOGS_ENABLED == true) UnityEngine.Debug.Log(config.files[i].GetInstanceID());
+                //Debug.Log(config.files[i].GetInstanceID());
                 item.displayName = config.Configs[i].Files[j].name;
                 item.icon = _scriptableObjectIcon; // AssetPreview.GetMiniThumbnail(config.files[i]);
                 cachedCategory.AddChild(item);
@@ -202,7 +202,7 @@ class DBEditorTreeView : TreeView
         var selected = new List<int> { id };
         SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
         Save();
-        //if (TU.Constants.LOGS_ENABLED == true) UnityEngine.Debug.LogFormat("Created new element of type {0}, id: {1}", className, id);
+        //Debug.LogFormat("Created new element of type {0}, id: {1}", className, id);
     }
 
     public Dictionary<int, string> GetElementTypes()

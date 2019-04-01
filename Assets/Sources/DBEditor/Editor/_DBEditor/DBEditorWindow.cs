@@ -25,9 +25,7 @@ namespace DBEditor
         private float _splitterWidth = 0;
         private float _labelWidth;
 
-        private const string _menuPath = "Tools/DB Editor";
-
-        [MenuItem(_menuPath)]
+        [MenuItem ("Tools/DB Editor")]
 		static void Init()
 		{
             if (!_loaded)

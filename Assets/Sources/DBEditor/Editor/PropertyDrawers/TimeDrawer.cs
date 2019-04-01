@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 [CustomPropertyDrawer(typeof(TimeAttribute))]
 public class TimeDrawer : PropertyDrawer
@@ -17,12 +18,8 @@ public class TimeDrawer : PropertyDrawer
         _values[3] = (int)((val - rawSeconds) * 1000);  // Miliseconds
 
         // Restoring the tooltip attribute.
-        var tooltipAttributes = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true);
-        if (tooltipAttributes.Length > 0)
-        {
-            var tooltipAttribute = tooltipAttributes[0] as TooltipAttribute;
-            label.tooltip = tooltipAttribute != null ? tooltipAttribute.tooltip : "";
-        }
+        var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true);
+        label.tooltip = tooltipAttribute != null && tooltipAttribute.Length > 0 ? ((TooltipAttribute)tooltipAttribute[0]).tooltip : "";
 
         var labels = new GUIContent[] { new GUIContent("H"), new GUIContent("M"), new GUIContent("S"), new GUIContent("m") };
         var pos = new Rect(EditorGUIUtility.labelWidth, position.y, 250f, EditorGUIUtility.singleLineHeight);

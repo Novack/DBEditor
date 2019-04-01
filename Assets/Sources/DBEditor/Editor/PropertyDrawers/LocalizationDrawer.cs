@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿//using I2.Loc;
+using UnityEditor;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(LocalizationAttribute))]
@@ -81,8 +82,7 @@ public class LocalizationDrawer : PropertyDrawer
         if (string.IsNullOrEmpty(locKey))
             return "";
 
-        //return LocalizationManager.GetTranslation(locKey);
-        return locKey;
+        return "soemthing"; // LocalizationManager.GetTranslation(locKey);
     }
 
     private void SetTranslation(string locKey, string translation)
@@ -95,9 +95,9 @@ public class LocalizationDrawer : PropertyDrawer
 
         locKey = locKey.Trim();
 
-        /*
         if (!string.IsNullOrEmpty(locKey))
         {
+            /*
             var source = LocalizationManager.GetSourceContaining(locKey);
             var enIdx = source.GetLanguageIndexFromCode("en");
             var termData = source.GetTermData(locKey);
@@ -114,7 +114,7 @@ public class LocalizationDrawer : PropertyDrawer
                 termData.Languages[enIdx] = newEnglish;
                 EditorUtility.SetDirty(source);
             }
+            */
         }
-        */
     }
 }
