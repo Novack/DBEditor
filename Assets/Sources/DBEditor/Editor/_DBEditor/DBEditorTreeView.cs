@@ -19,7 +19,7 @@ class DBEditorTreeView : TreeView
 		showBorder = true;
         _folderIcon = EditorGUIUtility.FindTexture("Folder Icon");
         _folderEmptyIcon = EditorGUIUtility.FindTexture("FolderEmpty Icon");
-        _scriptableObjectIcon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
+        _scriptableObjectIcon = AssetPreview.GetMiniTypeThumbnail(typeof(GameObject)); // EditorGUIUtility.FindTexture("ScriptableObject Icon");
 
         Reload();
 	}
@@ -104,7 +104,7 @@ class DBEditorTreeView : TreeView
                 _configIdxById.Add(id, i);
                 //Debug.Log(config.files[i].GetInstanceID());
                 item.displayName = config.Configs[i].Files[j].name;
-                item.icon = _scriptableObjectIcon; // AssetPreview.GetMiniThumbnail(config.files[i]);
+                item.icon = _scriptableObjectIcon; // AssetPreview.GetMiniThumbnail(config.Configs[i].Files[j]);
                 cachedCategory.AddChild(item);
             }
         }		
