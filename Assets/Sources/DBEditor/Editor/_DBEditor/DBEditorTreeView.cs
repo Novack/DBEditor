@@ -78,8 +78,19 @@ class DBEditorTreeView : TreeView
                 {
                     var classType = tmpObj.GetType();
                     ScriptableObject.DestroyImmediate(tmpObj, true);
-                    var arr = Resources.FindObjectsOfTypeAll(classType);
+
+                    var arr = Resources.FindObjectsOfTypeAll(classType);// <= this is not reliable, not returning all objects as expected, just those already loaded into memory
                     config.Configs[i].Files = new List<Object>(arr);
+
+                    //var arr = AssetDatabase.FindAssets("t:" + classType.ToString(), new[] { config.Configs[i].FileStoragePath });
+                    //var objList = new List<Object>();
+                    //foreach (var item in arr)
+                    //{
+                    //    var path = AssetDatabase.GUIDToAssetPath(item);
+                    //    var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                    //    objList.Add(obj);
+                    //}
+                    //config.Configs[i].Files = new List<Object>(objList);
                 }
             }
 
@@ -342,7 +353,6 @@ class DBEditorTreeView : TreeView
 	{
 		if (state.selectedIDs.Count == 0)
 			return;
-
 
         // Only deleting first of the selection list.
         int id = state.selectedIDs[0];
