@@ -9,6 +9,7 @@ class DBEditorTreeView : TreeView
 	private DBEditorConfig config;
 	private int _currentCatId;
     private Texture2D _folderIcon;
+    private Texture2D _folderOpenIcon;
     private Texture2D _folderEmptyIcon;
     private Texture2D _scriptableObjectIcon;
     private Dictionary<int, int> _configIdxById;
@@ -17,9 +18,11 @@ class DBEditorTreeView : TreeView
 	{
 		config = configParam;
 		showBorder = true;
+        // https://github.com/halak/unity-editor-icons
         _folderIcon = EditorGUIUtility.FindTexture("Folder Icon");
+        _folderOpenIcon = EditorGUIUtility.FindTexture("FolderOpened Icon");
         _folderEmptyIcon = EditorGUIUtility.FindTexture("FolderEmpty Icon");
-        _scriptableObjectIcon = AssetPreview.GetMiniTypeThumbnail(typeof(GameObject)); // EditorGUIUtility.FindTexture("ScriptableObject Icon");
+        _scriptableObjectIcon = EditorGUIUtility.IconContent("d_ScriptableObject Icon").image as Texture2D;  //EditorGUIUtility.FindTexture("ScriptableObject Icon"); //AssetPreview.GetMiniTypeThumbnail(typeof(GameObject));
 
         Reload();
 	}
@@ -77,7 +80,7 @@ class DBEditorTreeView : TreeView
             {
                 if (config.Configs[i].Files[j] == null)
                 {
-                    Debug.LogWarningFormat("Missing elements, alphabetical sorting not done at category {0}.", config.Configs[i].TreeViewPath);
+                    Debug.LogWarningFormat("Missing elements, alphabetical sorting not completed at category {0}.", config.Configs[i].TreeViewPath);
                     sort = false;
                     break;
                 }
@@ -136,13 +139,9 @@ class DBEditorTreeView : TreeView
 	
 	protected override void SetupDragAndDrop(SetupDragAndDropArgs args)
 	{
-        var selection = GetSelectedObjects();
-        if (selection == null)
-            return;
-
         DragAndDrop.PrepareStartDrag();
 		DragAndDrop.StartDrag("DBEditorDrag");
-        DragAndDrop.objectReferences = selection;
+        DragAndDrop.objectReferences = GetObjectsById(args.draggedItemIDs);
 	}
 	
 	protected override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
@@ -176,7 +175,13 @@ class DBEditorTreeView : TreeView
 		if (Mathf.Abs(item.id) > config.MaxCategoryId)
 			return false;
 
-        item.icon = IsExpanded(item.id) ? _folderEmptyIcon : _folderIcon;
+        if (!item.hasChildren)
+        {
+            item.icon = _folderEmptyIcon;
+            return false;
+        }
+
+        item.icon = IsExpanded(item.id) ? _folderOpenIcon : _folderIcon;
         return true;
 	}
 	
@@ -201,7 +206,7 @@ class DBEditorTreeView : TreeView
         Reload();
         var selected = new List<int> { id };
         SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
-        Save();
+        SaveAll();
         //Debug.LogFormat("Created new element of type {0}, id: {1}", className, id);
     }
 
@@ -250,14 +255,14 @@ class DBEditorTreeView : TreeView
         config.Configs[idx].Files.Remove(obj);
         Selection.activeGameObject = null;
         AssetDatabase.DeleteAsset(assetPath);
-        Save();
+        SaveAll();
         Reload();
 		var selected = new List<int> { parent.id };
 		//SetExpanded(selected);//parent.id, true);
 		SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
 	}
 	
-    public void Save()
+    public void SaveAll()
     {
         AssetDatabase.SaveAssets();
     }
@@ -284,7 +289,7 @@ class DBEditorTreeView : TreeView
             var selected = new List<int> { duplicateObject.GetInstanceID() };
             SetSelection(selected, TreeViewSelectionOptions.RevealAndFrame);
 
-            Save();
+            SaveAll();
         }
         else
         {
@@ -318,24 +323,29 @@ class DBEditorTreeView : TreeView
 
     public Object[] GetSelectedObjects()
 	{
-		if (state.selectedIDs.Count == 0)
-			return null;
-		
-		List<Object> selectedObjs = new List<Object>();
-		for (int i = 0; i < state.selectedIDs.Count; i++)
-		{
-			if (Mathf.Abs(state.selectedIDs[i]) < config.MaxCategoryId)
-				continue;
-			
-			Object obj = EditorUtility.InstanceIDToObject(state.selectedIDs[i]);
-			selectedObjs.Add(obj);
-		}
-		
-		if (selectedObjs.Count == 0)
-			return null;
-		
-		return selectedObjs.ToArray();
+        return GetObjectsById(state.selectedIDs);
 	}
+
+    private Object[] GetObjectsById(IList<int> ids)
+    {
+        if (ids == null || ids.Count == 0)
+            return null;
+
+        List<Object> objects = new List<Object>();
+        for (int i = 0; i < ids.Count; i++)
+        {
+            if (Mathf.Abs(ids[i]) < config.MaxCategoryId)
+                continue;
+
+            Object obj = EditorUtility.InstanceIDToObject(ids[i]);
+            objects.Add(obj);
+        }
+
+        if (objects.Count == 0)
+            return null;
+
+        return objects.ToArray();
+    }
 	
 	#endregion
 }
