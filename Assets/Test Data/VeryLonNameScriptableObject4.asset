@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -13,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   testScriptableObject: {fileID: 11400000, guid: 8dd85d70044374748bb229d4af6662ca,
     type: 2}
+  testScriptableObjects: []
   none: 0
   standardFloat: 0
   lala: 4
@@ -26,9 +28,10 @@ MonoBehaviour:
     name: jhgjhg
     size: 0
   Field1:
-    Value: 'fjdghjfg
-
-'
+    valString: 
+    valInt: 0
+    valVector3: {x: 0, y: 0, z: 0}
+  mypropList: []
   trans: {fileID: 0}
   serverAddress: 192.168.0.1zcvbcb
   multilineString: 
@@ -36,3 +39,4 @@ MonoBehaviour:
   lockKey: uuyg
   lockKeyMultiline: ftyfuyu
   somethingElse: 0
+  myTimeTest: 0

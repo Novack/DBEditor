@@ -3,34 +3,47 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc0e419aa55d854478225f6c2ca4d080, type: 3}
   m_Name: TestScriptableObject
   m_EditorClassIdentifier: 
-  testScriptableObject: {fileID: 0}
+  testScriptableObject: {fileID: 11400000, guid: 69d6437e80d5acb479d6a1154bd11cd4,
+    type: 2}
   none: 0
-  standardFloat: 0
-  lala: 0
-  lele: 
-  lilo: 
-  strele: 
-  MyTextArea: 
-  col: {r: 0, g: 0, b: 0, a: 0}
-  vec: {x: 0, y: 0, z: 0}
+  standardFloat: 5575676
+  lala: 1
+  lele: 8e02000000000000
+  lilo: 0000000000000000
+  strele: jbkhuj
+  MyTextArea: 'kjlj
+
+'
+  col: {r: 0.8490566, g: 0.09211465, b: 0.09211465, a: 0}
+  vec: {x: 545, y: 452, z: 452}
   caracok:
-    name: 
-    size: 0
+    name: 654gyjgj
+    size: 55
   Field1:
-    Value: 
+    valString: jkjhkjhk
+    valInt: 5454
+    valVector3: {x: 54, y: 67, z: 7}
+  mypropList:
+  - valString: 
+    valInt: 0
+    valVector3: {x: 0, y: 0, z: 0}
+  - valString: 
+    valInt: 0
+    valVector3: {x: 0, y: 0, z: 0}
   trans: {fileID: 0}
-  serverAddress: 192.168.0.1
+  serverAddress: hgj
   multilineString: 
-  normalString: 
+  normalString: ghui
   lockKey: 
   lockKeyMultiline: 
-  somethingElse: 0
-  myTimeTest: 0
+  somethingElse: 65
+  myTimeTest: 18305.006

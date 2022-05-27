@@ -14,7 +14,8 @@ public class TestScriptableObject : ScriptableObject
 	}
 	
 	public TestScriptableObject testScriptableObject;
-	
+	public List<TestScriptableObject> testScriptableObjects;
+		
 	[HideInInspector]
 	public int none;
     public float standardFloat;
@@ -34,6 +35,7 @@ public class TestScriptableObject : ScriptableObject
     [Space(10)]
     [Tooltip("Tests for custom Property Drawers")]
     public MyPropertyType Field1;
+	public List<MyPropertyType> mypropList;
     [Space(10)]
     [Tooltip("Tests for Custom Inspectors")]
     public Transform trans;

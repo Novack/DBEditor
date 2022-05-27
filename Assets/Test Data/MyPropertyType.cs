@@ -1,7 +1,10 @@
 ﻿using System;
+using UnityEngine;
 
 [Serializable]
 public class MyPropertyType
 {
-    public string Value;
+    public string valString;
+    public int valInt;
+    public Vector3 valVector3;
 }
