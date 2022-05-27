@@ -142,14 +142,8 @@ namespace DBEditor
 				Editor editor = Editor.CreateEditor(_selected);
                 //EditorGUILayout.InspectorTitlebar(true, _selected);
                 editor.DrawHeader();
-
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(15); // Offset for collections collapse indicator arrows can be rendered.
-                EditorGUILayout.BeginVertical();
                 //editor.DrawDefaultInspector();
                 editor.OnInspectorGUI();
-                EditorGUILayout.EndVertical();
-                EditorGUILayout.EndHorizontal();
 
                 GUILayout.Space(30);
 
