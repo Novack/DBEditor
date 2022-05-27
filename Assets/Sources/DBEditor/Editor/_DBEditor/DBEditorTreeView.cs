@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DBEditor;
 using UnityEditor;
 using UnityEngine;
+using System.Text;
 
 class DBEditorTreeView : TreeView
 {
@@ -13,6 +14,13 @@ class DBEditorTreeView : TreeView
     private Texture2D _folderEmptyIcon;
     private Texture2D _scriptableObjectIcon;
     private Dictionary<int, int> _configIdxById;
+
+    private Stack<object> _objectsToExplore;
+    private HashSet<object> _visitedObjects;
+    public bool deepSearchEnabled = false;
+    private StringBuilder _builder;
+
+
 
     public DBEditorTreeView(TreeViewState treeViewState, DBEditorConfig configParam) : base(treeViewState)
 	{
@@ -184,11 +192,110 @@ class DBEditorTreeView : TreeView
         item.icon = IsExpanded(item.id) ? _folderOpenIcon : _folderIcon;
         return true;
 	}
-	
-	#endregion
-	
-	#region Custom Methods
-	
+        
+    private string SplitOnPascalCase(string term)
+    {
+        _builder.Clear();
+        int i = 0;
+        while (i < term.Length)
+        {
+            if (char.IsUpper(term[i]) && i != 0)
+            {
+                _builder.Append(" ");
+            }
+            _builder.Append(term[i]);
+            i++;
+        }
+        return _builder.ToString();
+    }
+
+    protected override bool DoesItemMatchSearch(TreeViewItem item, string search)
+    {
+        if (_builder == null)
+        {
+            _builder = new StringBuilder();
+        }
+        if (deepSearchEnabled)
+        {
+            string lowercaseSearch = search.ToLower();
+            if (_objectsToExplore == null)
+            {
+                _objectsToExplore = new Stack<object>();
+                _visitedObjects = new HashSet<object>();
+            }
+            else
+            {
+                _objectsToExplore.Clear();
+                _visitedObjects.Clear();
+            }
+            var root = EditorUtility.InstanceIDToObject(item.id);
+            _objectsToExplore.Push(root);
+            while (_objectsToExplore.Count > 0)
+            {
+                var currItem = _objectsToExplore.Pop();
+                var obj = currItem;
+                if (obj != null)
+                {
+                    try
+                    {
+                        if (obj is Object)
+                        {
+                            if ((obj as Object) != null && (obj as Object).name != null && (obj as Object).name.ToLower().Contains(lowercaseSearch))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    var fields = obj.GetType().GetFields();
+                    if (fields != null && fields.Length > 0)
+                    {
+                        foreach (var field in fields)
+                        {
+                            if (field.Name.ToLower().Contains(lowercaseSearch) ||
+                                 SplitOnPascalCase(field.Name).ToLower().Contains(lowercaseSearch))//match fields
+                            {
+                                return true;
+                            }
+                            var value = field.GetValue(obj);
+                            var ienum = value as System.Collections.IEnumerable;
+                            if (ienum != null && !(value is string))
+                            {                                
+                                foreach (var i in ienum)
+                                {
+                                    if (i != null && !_visitedObjects.Contains(i))
+                                    {
+                                        if (i.ToString().ToLower().Contains(lowercaseSearch))
+                                        {
+                                            return true;
+                                        }
+                                        _visitedObjects.Add(i);
+                                        _objectsToExplore.Push(i);
+                                    }
+                                }
+                            }
+                            if (value != null && value.ToString() != "")
+                            {
+                                if (value.ToString().ToLower().Contains(lowercaseSearch))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return base.DoesItemMatchSearch(item, search);
+    }
+
+    #endregion
+
+    #region Custom Methods
+
     public void CreateNewElement(object configIndex)
     {
         var idx = (int)configIndex;

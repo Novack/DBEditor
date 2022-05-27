@@ -236,8 +236,10 @@ namespace DBEditor
                 _dbEditorTreeView.FocusSelected();
             }
 
-            GUILayout.Space(10);
-			
+            GUILayout.Space(5);
+
+            _dbEditorTreeView.deepSearchEnabled = GUILayout.Toggle(_dbEditorTreeView.deepSearchEnabled, "Deep Search", GetStyle("toolbarbutton"));
+
             if (GUILayout.Button("Update", GetStyle("toolbarbutton")))
             {
                 _dbEditorTreeView.Reload();
