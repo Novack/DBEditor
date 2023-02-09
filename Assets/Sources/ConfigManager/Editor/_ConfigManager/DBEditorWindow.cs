@@ -231,6 +231,11 @@ namespace ConfigManager
 			{
                 GUILayout.Space(15);
 				
+				if (GUILayout.Button("Open", GetStyle("toolbarbutton")))
+				{
+					_dbEditorTreeView.OpenAsset();
+				}
+
 				if (GUILayout.Button("Rename", GetStyle("toolbarbutton")))
 				{
 					_dbEditorTreeView.StartRename();
