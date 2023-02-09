@@ -48,10 +48,6 @@ public class TestScriptableObject : ScriptableObject
 	[Space(10)]
 	public string normalString;
 	[Header("Localization")]
-    [Localization(false)]
-    public string lockKey;
-    [Localization(true)]
-    public string lockKeyMultiline;
 	public int somethingElse;
 	[Time]
     [Tooltip("Testing tooltip...")]

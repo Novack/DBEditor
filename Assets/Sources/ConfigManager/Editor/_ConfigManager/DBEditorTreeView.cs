@@ -1,13 +1,15 @@
 using UnityEditor.IMGUI.Controls;
 using System.Collections.Generic;
-using DBEditor;
+using ConfigManager;
 using UnityEditor;
 using UnityEngine;
 using System.Text;
 
+namespace ConfigManager
+{
 class DBEditorTreeView : TreeView
 {
-	private DBEditorConfig config;
+	private CMConfig config;
 	private int _currentCatId;
     private Texture2D _folderIcon;
     private Texture2D _folderOpenIcon;
@@ -22,7 +24,7 @@ class DBEditorTreeView : TreeView
 
 
 
-    public DBEditorTreeView(TreeViewState treeViewState, DBEditorConfig configParam) : base(treeViewState)
+    public DBEditorTreeView(TreeViewState treeViewState, CMConfig configParam) : base(treeViewState)
 	{
 		config = configParam;
 		showBorder = true;
@@ -455,4 +457,5 @@ class DBEditorTreeView : TreeView
     }
 	
 	#endregion
+    }
 }

@@ -12,7 +12,7 @@ public class PreviewTextureAttribute : PropertyAttribute
     public FieldType fieldType;
 
 
-    public PreviewTextureAttribute(int size, FieldType fieldType = FieldType.Sprite)
+    public PreviewTextureAttribute(int size = 32, FieldType fieldType = FieldType.Sprite)
     {
         this.size = size;
         this.fieldType = fieldType;
