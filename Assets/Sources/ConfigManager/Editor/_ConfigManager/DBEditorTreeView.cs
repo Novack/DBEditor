@@ -293,6 +293,14 @@ namespace ConfigManager
             return base.DoesItemMatchSearch(item, search);
         }
 
+        protected override void DoubleClickedItem(int id)
+        {
+            if (Mathf.Abs(id) < config.MaxCategoryId)
+                return;
+
+            AssetDatabase.OpenAsset(id);
+        }
+
         #endregion
 
         #region Custom Methods
