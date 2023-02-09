@@ -47,11 +47,16 @@ public class TestScriptableObject : ScriptableObject
 	public string multilineString;
 	[Space(10)]
 	public string normalString;
-	[Header("Localization")]
 	public int somethingElse;
 	[Time]
     [Tooltip("Testing tooltip...")]
 	public float myTimeTest;
 
+
+	[EditorButton]
+	private void HelloWorld(string name)
+    {
+		Debug.Log($"Hello World, my name is {name}!");
+    }
 
 }

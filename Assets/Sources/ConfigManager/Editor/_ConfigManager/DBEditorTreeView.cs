@@ -1,6 +1,5 @@
 using UnityEditor.IMGUI.Controls;
 using System.Collections.Generic;
-using ConfigManager;
 using UnityEditor;
 using UnityEngine;
 using System.Text;
