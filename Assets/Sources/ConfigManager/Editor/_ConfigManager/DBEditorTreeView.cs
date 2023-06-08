@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.Text;
+using UnityEngine.Events;
 
 namespace ConfigManager
 {
     class DBEditorTreeView : TreeView
     {
+        public UnityAction<Object[], bool> selectionChange;
+
         private CMConfig config;
         private int _currentCatId;
         private Texture2D _folderIcon;
@@ -150,7 +153,7 @@ namespace ConfigManager
         {
             DragAndDrop.PrepareStartDrag();
             DragAndDrop.StartDrag("DBEditorDrag");
-            DragAndDrop.objectReferences = GetObjectsById(args.draggedItemIDs);
+            DragAndDrop.objectReferences = GetObjectsById(args.draggedItemIDs).ToArray();
         }
 
         protected override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
@@ -299,6 +302,19 @@ namespace ConfigManager
                 return;
 
             AssetDatabase.OpenAsset(id);
+        }
+
+        protected override void SelectionChanged(IList<int> selectedIds)
+        {
+            List<Object> selection = GetObjectsById(selectedIds);
+            bool sameType = true;
+            if (selection != null && selection.Count > 0)
+            {
+                var selectionType = selection[0].GetType();
+                sameType = selection.TrueForAll(s => s.GetType() == selectionType);
+            }
+            var selectionArray = selection != null ? selection.ToArray() : null;
+            selectionChange?.Invoke(selectionArray, sameType);
         }
 
         #endregion
@@ -451,10 +467,10 @@ namespace ConfigManager
 
         public Object[] GetSelectedObjects()
         {
-            return GetObjectsById(state.selectedIDs);
+            return GetObjectsById(state.selectedIDs).ToArray();
         }
 
-        private Object[] GetObjectsById(IList<int> ids)
+        private List<Object> GetObjectsById(IList<int> ids)
         {
             if (ids == null || ids.Count == 0)
                 return null;
@@ -472,7 +488,7 @@ namespace ConfigManager
             if (objects.Count == 0)
                 return null;
 
-            return objects.ToArray();
+            return objects;
         }
 
         #endregion
