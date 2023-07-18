@@ -34,6 +34,16 @@ namespace ConfigManager
         private Texture2D _titleBarButtonIcon;
         private GUIStyle _tittleBarButtonStyle;
 
+        private bool _stylesDefined;
+        private GUIStyle _toolbarButtonStyle;
+        private GUIStyle _projectBrowserTopBarBgStyle;
+        private GUIStyle _inLockButtonStyle;
+        private GUIStyle _toolbarStyle;
+        private GUIStyle _toolbarDropDownStyle;
+        private GUIStyle _toolbarSearchTextFieldPopupStyle;
+        private GUIStyle _toolbarSearchCancelButtonStyle;
+        private GUIStyle _toolbarSearchCancelButtonEmptyStyle;
+
 
         [MenuItem("Tools/Config Manager", priority = 5000)]
         static void Init()
@@ -62,6 +72,23 @@ namespace ConfigManager
 
             LoadWindow();
             EditorApplication.update -= OnEditorUpdate;
+        }
+
+        private void DefineStyles()
+        {
+            if (_stylesDefined)
+                return;
+
+            _toolbarButtonStyle = (GUIStyle)"toolbarbutton";
+            _projectBrowserTopBarBgStyle = (GUIStyle)"ProjectBrowserTopBarBg";
+            _inLockButtonStyle = (GUIStyle)"IN LockButton";
+            _toolbarStyle = (GUIStyle)"toolbar";
+            _toolbarDropDownStyle = (GUIStyle)"toolbarDropDown";
+            _toolbarSearchTextFieldPopupStyle = (GUIStyle)"ToolbarSearchTextFieldPopup";
+            _toolbarSearchCancelButtonStyle = (GUIStyle)"ToolbarSearchCancelButton";
+            _toolbarSearchCancelButtonEmptyStyle = (GUIStyle)"ToolbarSearchCancelButtonEmpty";
+
+            _stylesDefined = true;
         }
 
         private static void LoadWindow()
@@ -124,18 +151,9 @@ namespace ConfigManager
             }
         }
 
-        private GUIStyle GetStyle(string name)
-        {
-            //if (_editorSkin == null)
-            //	_editorSkin = ScriptableObject.Instantiate(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector)) as GUISkin;
-            //GUIStyle style =  _editorSkin.FindStyle(name);
-            GUIStyle style = (GUIStyle)name;
-
-            return style;
-        }
-
         private void OnGUI()
         {
+            DefineStyles();
             DrawToolBar();
 
             EditorGUILayout.BeginHorizontal();
@@ -162,9 +180,9 @@ namespace ConfigManager
 
             if (_selected != null && _selected.Length > 0)
             {
-                EditorGUILayout.BeginHorizontal(GetStyle("ProjectBrowserTopBarBg"));
+                EditorGUILayout.BeginHorizontal(_projectBrowserTopBarBgStyle);
                 GUILayout.FlexibleSpace();
-                _inspectorLock = GUILayout.Toggle(_inspectorLock, "", GetStyle("IN LockButton"));
+                _inspectorLock = GUILayout.Toggle(_inspectorLock, "", _inLockButtonStyle);
                 if (_inspectorLock != _inspectorWasLocked)
                 {
                     OnTreeViewSelectionChange(_selectedCached, _sameTypeCached);
@@ -198,7 +216,7 @@ namespace ConfigManager
         }
 
         /// <summary>
-        /// Draw buttons on toolbar.Automatically called by unity.
+        /// Draw buttons on toolbar. Automatically called by unity.
         /// </summary>
         private void ShowButton(Rect position)
         {
@@ -218,20 +236,20 @@ namespace ConfigManager
 
         void DrawToolBar()
         {
-            GUILayout.BeginHorizontal(GetStyle("toolbar"));
+            GUILayout.BeginHorizontal(_toolbarStyle);
 
-            if (GUILayout.Button(_refreshIcon, GetStyle("toolbarbutton")))
+            if (GUILayout.Button(_refreshIcon, _toolbarButtonStyle))
             {
                 _dbEditorTreeView.Reload();
                 LoadCreateMenu();
             }
 
-            if (GUILayout.Button("Expand All", GetStyle("toolbarbutton")))
+            if (GUILayout.Button("Expand All", _toolbarButtonStyle))
             {
                 _dbEditorTreeView.ExpandAll();
             }
 
-            if (GUILayout.Button("Collapse All", GetStyle("toolbarbutton")))
+            if (GUILayout.Button("Collapse All", _toolbarButtonStyle))
             {
                 _dbEditorTreeView.CollapseAll();
             }
@@ -239,19 +257,19 @@ namespace ConfigManager
             /*
             GUILayout.Space(10);
 
-            if (GUILayout.Button("AZ↓", GetStyle("toolbarbutton")))
+            if (GUILayout.Button("AZ↓", _toolbarButtonStyle))
 			{
 				_dbEditorTreeView.SortAlphabetically();
 			}
             */
             GUILayout.Space(10);
 
-            if (GUILayout.Button("Create New", GetStyle("toolbarDropDown")))
+            if (GUILayout.Button("Create New", _toolbarDropDownStyle))
             {
                 _createMenu.DropDown(new Rect(140f, -83f, 50f, 100f));
             }
 
-            if (GUILayout.Button("Save All", GetStyle("toolbarbutton")))
+            if (GUILayout.Button("Save All", _toolbarButtonStyle))
             {
                 _dbEditorTreeView.SaveAll();
                 this.ShowNotification(new GUIContent("Saving..."), 0.75f);
@@ -261,29 +279,29 @@ namespace ConfigManager
             {
                 GUILayout.Space(15);
 
-                if (GUILayout.Button("Open", GetStyle("toolbarbutton")))
+                if (GUILayout.Button("Open", _toolbarButtonStyle))
                 {
                     _dbEditorTreeView.OpenAsset();
                 }
 
-                if (GUILayout.Button("Rename", GetStyle("toolbarbutton")))
+                if (GUILayout.Button("Rename", _toolbarButtonStyle))
                 {
                     _dbEditorTreeView.StartRename();
                 }
 
-                if (GUILayout.Button("Duplicate", GetStyle("toolbarbutton")))
+                if (GUILayout.Button("Duplicate", _toolbarButtonStyle))
                 {
                     _dbEditorTreeView.Duplicate();
                 }
 
-                if (GUILayout.Button("Delete", GetStyle("toolbarbutton")))
+                if (GUILayout.Button("Delete", _toolbarButtonStyle))
                 {
                     _dbEditorTreeView.Delete();
                 }
 
                 GUILayout.Space(5);
 
-                if (GUILayout.Button("Find in Project", GetStyle("toolbarbutton")))
+                if (GUILayout.Button("Find in Project", _toolbarButtonStyle))
                 {
                     EditorGUIUtility.PingObject(_selected[0]);
                 }
@@ -291,9 +309,9 @@ namespace ConfigManager
 
             GUILayout.FlexibleSpace();
 
-            _searchString = GUILayout.TextField(_searchString, GetStyle("ToolbarSeachTextFieldPopup"), GUILayout.Width(200));
-            var editorStyle = string.IsNullOrEmpty(_searchString) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton";
-            if (GUILayout.Button("", GetStyle(editorStyle)))
+            _searchString = GUILayout.TextField(_searchString, _toolbarSearchTextFieldPopupStyle, GUILayout.Width(200));
+            var searchStyle = string.IsNullOrEmpty(_searchString) ? _toolbarSearchCancelButtonEmptyStyle : _toolbarSearchCancelButtonStyle;
+            if (GUILayout.Button("", searchStyle))
             {
                 _searchString = "";
                 GUI.FocusControl(null);
@@ -302,7 +320,7 @@ namespace ConfigManager
 
             GUILayout.Space(5);
 
-            _dbEditorTreeView.deepSearchEnabled = GUILayout.Toggle(_dbEditorTreeView.deepSearchEnabled, "Deep Search", GetStyle("toolbarbutton"));
+            _dbEditorTreeView.deepSearchEnabled = GUILayout.Toggle(_dbEditorTreeView.deepSearchEnabled, "Deep Search", _toolbarButtonStyle);
 
             GUILayout.EndHorizontal();
         }
